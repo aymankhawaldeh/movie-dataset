@@ -8,13 +8,13 @@ const app = express();
 const directorRoutes = require('./routes/directorRoutes');
 const actorRoutes = require('./routes/actorRoutes');
 const movieRoutes = require('./routes/movieRoutes');
-const movieActorRoutes = require('./routes/movieRoutes');
+const movieActorRoutes = require('./routes/movieActorRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 
-app.use(cors());
 // app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
+app.use(cors());
 
 app.use('/api', directorRoutes);
 app.use('/api', actorRoutes);

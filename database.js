@@ -8,4 +8,11 @@ var connection = mysql.createConnection({
     user: process.env.USER,
     password: process.env.PASSWORD    
 })
+
+
+
+
+
+
+
 module.exports = connection

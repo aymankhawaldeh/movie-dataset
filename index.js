@@ -33,7 +33,7 @@ app.get('/passing', (req, res) => {
     let csvStream = csv.parseFile(".\\csv\\movie_metadata.csv", { headers: true })
         .on("data", function (record) {
             csvStream.pause();
-            if (counter < 100) {
+            // if (counter < 100) {
 
                 let title = record.movie_title.trim().replace(/\s/g, "") == "" ? null : record.movie_title.trim()
                 let duration = record.duration.replace(/\s/g, "") == "" ? 0 : record.duration
@@ -129,14 +129,12 @@ app.get('/passing', (req, res) => {
                     }
                     movieId = rows[0]?.movie_id
 
-                    console.log('movieID rr', movieId);
 
 
                 });
 
 
 
-                console.log('barra rr', movieId);
 
 
 
@@ -151,10 +149,8 @@ app.get('/passing', (req, res) => {
                     // console.log('rowssss' , rows[0]?.actor_id)
                     // if(rows[0] && rows[0]?.actor_id)  arr.push(rows[0].actor_id)
                     // console.log('allrows ', rows)
-                    console.log('out rr', movieId);
 
                     rows.map((elm) => {
-                        console.log('in rr', movieId);
 
 
                         connection.query("INSERT IGNORE INTO movies_actors (movie_id, actor_id) VALUES (?, ?)", [movieId, elm.actor_id], function (err) {
@@ -165,8 +161,7 @@ app.get('/passing', (req, res) => {
 
                     })
 
-                    // arr = rows.map((actorID) => actorID.actor_id)
-                    // console.log('arrrrrrrrrrrrrrr', arr)
+                  
 
 
                 })
@@ -178,8 +173,8 @@ app.get('/passing', (req, res) => {
 
 
 
-                ++counter;
-            }
+            //     ++counter;
+            // }
         }).on("end", function () {
             console.log("Job is done!");
         }).on("error", function (err) {
@@ -201,13 +196,110 @@ app.get('/passing', (req, res) => {
 
 
 
-
 app.listen(8000, () => {
 
     console.log('App is listening on port 8000');
-    connection.connect(function (err) {
+
+    connection.connect((err) => {
         if (err) throw err;
-        console.log('database connected')
+        console.log('database connected');
+
+
+        let createDirectors = `CREATE TABLE IF NOT EXISTS directors (
+            director_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+            name varchar(45) UNIQUE not null,
+            facebook_likes INT
+            
+            );`;
+
+
+        let createActors = `CREATE TABLE IF NOT EXISTS actors(
+            actor_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+            name VARCHAR(45) UNIQUE NOT NULL,
+            facebook_likes INT,
+            age INT,
+            facebook_page_link VARCHAR(255)
+            );`
+
+
+
+        let createMovies = `CREATE TABLE IF NOT EXISTS movies (
+                movie_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                title VARCHAR(45) UNIQUE NOT NULL,
+                director varchar(45) ,
+                duration INT,
+                gross DECIMAL,
+                genres JSON,
+                num_voted_users INT,
+                cast_total_facebook_likes INT,
+                plot_keywords JSON,
+                imdb_link VARCHAR(255),
+                num_user_for_reviews INT,
+                language VARCHAR(15),
+                country VARCHAR(25),
+                content_rating VARCHAR(25),
+                budget DECIMAL,
+                title_year YEAR(4),
+                imdb_score float,
+                aspect_ratio double,
+                movie_facebook_likes INT,
+                actors JSON,
+                color VARCHAR(15),
+                dir_id INT not null,
+                CONSTRAINT ima
+                FOREIGN KEY(dir_id) REFERENCES directors(director_id)
+                ON DELETE CASCADE ON UPDATE CASCADE
+                
+                
+                );`
+
+
+
+        let createMoviesActors = `CREATE TABLE IF NOT EXISTS movies_actors (
+       movie_id INT NOT NULL,
+       actor_id INT NOT NULL,
+       PRIMARY KEY (movie_id, actor_id),
+       CONSTRAINT kmc
+       FOREIGN KEY(movie_id) REFERENCES movies(movie_id)
+       ON DELETE CASCADE ON UPDATE CASCADE,
+       CONSTRAINT apx
+       FOREIGN KEY(actor_id) REFERENCES actors(actor_id)
+       ON DELETE CASCADE ON UPDATE CASCADE
+       
+       );`
+
+
+
+
+        connection.query(createDirectors, function (err, results, fields) {
+            if (err) {
+                console.log(err.message);
+            }
+        });
+
+        connection.query(createActors, function (err, results, fields) {
+            if (err) {
+                console.log(err.message);
+            }
+        });
+
+
+        connection.query(createMovies, function (err, results, fields) {
+            if (err) {
+                console.log(err.message);
+            }
+        });
+
+
+        connection.query(createMoviesActors, function (err, results, fields) {
+            if (err) {
+                console.log(err.message);
+            }
+        });
+
+
+
+
     })
 
 

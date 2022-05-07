@@ -33,7 +33,7 @@ app.get('/passing', (req, res) => {
     let csvStream = csv.parseFile(".\\csv\\movie_metadata.csv", { headers: true })
         .on("data", function (record) {
             csvStream.pause();
-            // if (counter < 100) {
+             if (counter < 100) {
 
                 let title = record.movie_title.trim().replace(/\s/g, "") == "" ? null : record.movie_title.trim()
                 let duration = record.duration.replace(/\s/g, "") == "" ? 0 : record.duration
@@ -118,53 +118,137 @@ app.get('/passing', (req, res) => {
 
                         // if(result?.insertId) movieId = result?.insertId
                     });
+                    let lastMovieId = undefined
+                    let lasActorId= undefined
 
 
-
-
-                let movieId = undefined
-                connection.query("SELECT movie_id FROM movies WHERE title = ? ", title, function (err, rows) {
-                    if (err) {
-                        console.log(err);
+                    function create() {
+                        return new Promise((resolve, reject) => {
+                            
+                
+                      
+                            connection.query("SELECT movie_id FROM movies WHERE title = ? ", title, function (err, rows) {
+                                if (err) {
+                                    console.log(err);
+                                }
+                               return lastMovieId = rows[0]?.movie_id
+            
+            
+            
+                            });
+                            connection.query(`SELECT actor_id FROM actors WHERE name = ?`, [name1], function (err, rows) {
+                                if (err) {
+                                   reject(err);
+                                }
+                                lasActorId = rows[0]?.actor_id
+                                    resolve()
+                               
+                            })
+                
+                
+                        
+                        })
+                
                     }
-                    movieId = rows[0]?.movie_id
-
-
-
-                });
-
-
-
-
-
-
-                let sql = "SELECT actor_id FROM actors WHERE name  IN (" + connection.escape([name1, name2, name3]) + ")";
-                console.log("sqllll ", sql)
-                connection.query(sql, function (err, rows) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    // console.log('resulttttt' , result)
-                    // console.log('fieldssss' , fields)
-                    // console.log('rowssss' , rows[0]?.actor_id)
-                    // if(rows[0] && rows[0]?.actor_id)  arr.push(rows[0].actor_id)
-                    // console.log('allrows ', rows)
-
-                    rows.map((elm) => {
-
-
-                        connection.query("INSERT IGNORE INTO movies_actors (movie_id, actor_id) VALUES (?, ?)", [movieId, elm.actor_id], function (err) {
+                    function get() {
+                   
+                
+                        connection.query("INSERT IGNORE INTO movies_actors (movie_id, actor_id) VALUES (?, ?)", [lastMovieId, lasActorId], function (err) {
                             if (err) {
                                 console.log(err);
                             }
                         });
+                
+                    }
+                
+                    create().then(get).catch(err => console.log(err))
 
-                    })
 
-                  
+                    function create1() {
+                        return new Promise((resolve, reject) => {
+                            
+                
+                      
+                            connection.query("SELECT movie_id FROM movies WHERE title = ? ", title, function (err, rows) {
+                                if (err) {
+                                    console.log(err);
+                                }
+                               return lastMovieId = rows[0]?.movie_id
+            
+            
+            
+                            });
+                            connection.query(`SELECT actor_id FROM actors WHERE name = ?`, [name2], function (err, rows) {
+                                if (err) {
+                                   reject(err);
+                                }
+                                lasActorId = rows[0]?.actor_id
+                                    resolve()
+                               
+                            })
+                
+                
+                        
+                        })
+                
+                    }
+                    function get1() {
+                   
+                
+                        connection.query("INSERT IGNORE INTO movies_actors (movie_id, actor_id) VALUES (?, ?)", [lastMovieId, lasActorId], function (err) {
+                            if (err) {
+                                console.log(err);
+                            }
+                        });
+                
+                    }
+                
+                    create1().then(get1).catch(err => console.log(err))
 
 
-                })
+                    function create2() {
+                        return new Promise((resolve, reject) => {
+                            
+                
+                      
+                            connection.query("SELECT movie_id FROM movies WHERE title = ? ", title, function (err, rows) {
+                                if (err) {
+                                    console.log(err);
+                                }
+                               return lastMovieId = rows[0]?.movie_id
+            
+            
+            
+                            });
+                            connection.query(`SELECT actor_id FROM actors WHERE name = ?`, [name3], function (err, rows) {
+                                if (err) {
+                                   reject(err);
+                                }
+                                lasActorId = rows[0]?.actor_id
+                                    resolve()
+                               
+                            })
+                
+                
+                        
+                        })
+                
+                    }
+                    function get2() {
+                   
+                
+                        connection.query("INSERT IGNORE INTO movies_actors (movie_id, actor_id) VALUES (?, ?)", [lastMovieId, lasActorId], function (err) {
+                            if (err) {
+                                console.log(err);
+                            }
+                        });
+                
+                    }
+                
+                    create2().then(get2).catch(err => console.log(err))
+
+
+             
 
 
                 csvStream.resume();
@@ -173,8 +257,8 @@ app.get('/passing', (req, res) => {
 
 
 
-            //     ++counter;
-            // }
+                ++counter;
+            }
         }).on("end", function () {
             console.log("Job is done!");
         }).on("error", function (err) {

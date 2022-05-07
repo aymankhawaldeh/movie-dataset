@@ -21,7 +21,7 @@ router.get('/directors', (req, res) => {
 
 router.get('/director/:id', (req, res) => {
     let id = req.params.id;
-    connection.query("SELECT * FROM directors WHERE director_id = ?", [id], (err, rows, fields, result) => {
+    connection.query("SELECT * FROM directors WHERE id = ?", [id], (err, rows, fields, result) => {
         if (err) throw err;
         res.send(rows)
     })
@@ -105,7 +105,7 @@ router.put('/editDirector/:id', (req, res) => {
     let facebook_likes = req.body.facebook_likes;
 
 
-    connection.query("UPDATE  directors SET name = ? , facebook_likes = ? WHERE director_id = ? ", [name, facebook_likes, id], (err, result) => {
+    connection.query("UPDATE  directors SET name = ? , facebook_likes = ? WHERE id = ? ", [name, facebook_likes, id], (err, result) => {
         if (err) throw err;
         console.log(result)
         res.send({ "name": name, "facebook_likes": facebook_likes })
@@ -122,7 +122,7 @@ router.put('/editDirector/:id', (req, res) => {
 
 router.delete('/deleteDirector/:id', (req, res) => {
     let id = req.params.id;
-    connection.query("DELETE FROM directors WHERE director_id = ?", [id], (err, result) => {
+    connection.query("DELETE FROM directors WHERE id = ?", [id], (err, result) => {
         if (err) throw err;
         res.send("row with this id " + id + " is deleted")
     })

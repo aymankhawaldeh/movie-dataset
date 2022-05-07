@@ -15,30 +15,71 @@ router.get('/movie/search', (req, res) => {
 
 
 
-    let title = req.query.title;
-    let genres = JSON.stringify(req.query.genres)
-    let plot_keywords = JSON.stringify(req.query.plot_keywords)
+    let title;
+    let genres;
+    let plot_keywords;
 
 
 
-    newGenres = genres ? genres.replace(/\'/gi, '') : null
-    new_plot_keywords = plot_keywords ? plot_keywords.replace(/\'/gi, '') : null
+    req.query.title ? title = req.query.title : null
+    req.query.genres ? genres = JSON.stringify(req.query.genres).replace(/\'/gi, '') : null
+    req.query.plot_keywords ? plot_keywords = JSON.stringify(req.query.plot_keywords).replace(/\'/gi, '') : null
 
 
-    connection.query(`SELECT * FROM movies WHERE title = ? OR JSON_CONTAINS(genres, ?) OR  JSON_CONTAINS(plot_keywords, ?)`, [title, newGenres, new_plot_keywords], (err, result, rows, fields) => {
-        if (err) throw err;
+    console.log(title, genres, plot_keywords)
 
-        // console.log(" all actors id ", actor)
-        // console.log("result", result)
-        // console.log("rows", rows)
-        //   console.log("rows", rows)
-        //   console.log("genres", genres)
-        //   console.log("result", result[0])
+    if (plot_keywords == null && genres == null) {
+        connection.query(`SELECT * FROM movies WHERE  title = ? `, [title], (err, result, rows, fields) => {
+            if (err) throw err;
+            console.log("in", title)
 
-        res.send(result)
+            res.send(result)
+
+        })
+
+    } else if (plot_keywords == null && title == null) {
+        connection.query(`SELECT * FROM movies WHERE  JSON_CONTAINS(genres, ?) `, [genres], (err, result, rows, fields) => {
+            if (err) throw err;
+            res.send(result)
+
+        })
+
+    } else if (genres == null && title == null) {
+        connection.query(`SELECT * FROM movies WHERE  JSON_CONTAINS(plot_keywords, ?) `, [plot_keywords], (err, result, rows, fields) => {
+            if (err) throw err;
+            res.send(result)
+
+        })
+    } else
+        if (title == null) {
+            connection.query(`SELECT * FROM movies WHERE  JSON_CONTAINS(genres, ?) AND  JSON_CONTAINS(plot_keywords, ?)`, [genres, plot_keywords], (err, result, rows, fields) => {
+                if (err) throw err;
+                res.send(result)
+
+            })
+        } else if (genres == null) {
+            connection.query(`SELECT * FROM movies WHERE  title = ? AND JSON_CONTAINS(plot_keywords, ?)`, [title, plot_keywords], (err, result, rows, fields) => {
+                if (err) throw err;
+                res.send(result)
+
+            })
+
+        } else if (plot_keywords == null) {
+            connection.query(`SELECT * FROM movies WHERE  title = ? AND JSON_CONTAINS(genres, ?)`, [title, genres], (err, result, rows, fields) => {
+                if (err) throw err;
+                res.send(result)
+
+            })
+        } else {
+
+            connection.query(`SELECT * FROM movies WHERE title = ? AND JSON_CONTAINS(genres, ?) AND  JSON_CONTAINS(plot_keywords, ?)`, [title, genres, plot_keywords], (err, result, rows, fields) => {
+                if (err) throw err;
+                res.send(result)
+
+            })
+        }
 
 
-    })
 
 
 
@@ -56,11 +97,11 @@ router.get('/movie/count', (req, res) => {
         if (err) throw err;
 
         // console.log(" all actors id ", actor)
-         console.log("result", result)
+        console.log("result", result)
 
         // console.log("rows", rows)
         res.status(200).send(result)
-       
+
 
 
     })
@@ -83,36 +124,36 @@ router.get('/movie/all', (req, res) => {
     console.log("newGenres", newGenres)
     console.log("genres", genres)
 
-    if( !newGenres && !new_plot_keywords){
-       
+    if (!newGenres && !new_plot_keywords) {
+
         connection.query("SELECT * FROM movies", (err, result, rows, fields) => {
             if (err) throw err;
-    
-       
-    
+
+
+
             res.send(result)
-    
-    
+
+
         })
-    
-        
+
+
     } else {
 
 
-    connection.query(`SELECT * FROM movies WHERE JSON_CONTAINS(genres, ?)  OR  JSON_CONTAINS(plot_keywords, ?)`, [newGenres, new_plot_keywords], (err, result, rows, fields) => {
-        if (err) throw err;
+        connection.query(`SELECT * FROM movies WHERE JSON_CONTAINS(genres, ?)  OR  JSON_CONTAINS(plot_keywords, ?)`, [newGenres, new_plot_keywords], (err, result, rows, fields) => {
+            if (err) throw err;
 
-        // console.log(" all actors id ", actor)
-        // console.log("result", result)
-        // console.log("rows", rows)
-        //   console.log("rows", rows)
-        //   console.log("genres", genres)
-        //   console.log("result", result[0])
+            // console.log(" all actors id ", actor)
+            // console.log("result", result)
+            // console.log("rows", rows)
+            //   console.log("rows", rows)
+            //   console.log("genres", genres)
+            //   console.log("result", result[0])
 
-        res.send(result)
+            res.send(result)
 
 
-    })
+        })
     }
 
 

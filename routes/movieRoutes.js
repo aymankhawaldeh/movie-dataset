@@ -24,7 +24,7 @@ router.get('/movies', (req, res) => {
 
 router.get('/one-movie/:id', (req, res) => {
     let id = req.params.id;
-    connection.query("SELECT * FROM movies WHERE movie_id = ?", [id], (err, rows, fields, result) => {
+    connection.query("SELECT * FROM movies WHERE id = ?", [id], (err, rows, fields, result) => {
         if (err) throw err;
         res.send(rows)
     })
@@ -53,10 +53,10 @@ router.post('/addMovie', (req, res) => {
                 multiMovies.push(value)
 
                 connection.query("INSERT INTO movies \
-          (title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, director, color, dir_id) \
+          (title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, director, color, director_id) \
            VALUES \
-           (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT name FROM directors WHERE director_id = ? LIMIT 1), ?, ?)",
-                    [value.title, value.duration, value.gross, JSON.stringify(value.genres), value.num_voted_users, value.cast_total_facebook_likes, JSON.stringify(value.plot_keywords), value.imdb_link, value.num_user_for_reviews, value.language, value.country, value.content_rating, value.budget, value.title_year, value.imdb_score, value.aspect_ratio, value.movie_facebook_likes,  value.dir_id, value.color, value.dir_id], function (err, result) {
+           (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT name FROM directors WHERE id = ? LIMIT 1), ?, ?)",
+                    [value.title, value.duration, value.gross, JSON.stringify(value.genres), value.num_voted_users, value.cast_total_facebook_likes, JSON.stringify(value.plot_keywords), value.imdb_link, value.num_user_for_reviews, value.language, value.country, value.content_rating, value.budget, value.title_year, value.imdb_score, value.aspect_ratio, value.movie_facebook_likes,  value.director_id, value.color, value.director_id], function (err, result) {
                         if (err) {
                             console.log(err);
 
@@ -103,10 +103,10 @@ router.post('/addMovie', (req, res) => {
         let imdb_score = req.body.imdb_score;
         let aspect_ratio = req.body.aspect_ratio;
         let movie_facebook_likes = req.body.movie_facebook_likes;
-        let actors = JSON.stringify(req.body.actors);
+        // let actors = JSON.stringify(req.body.actors);
         let color = req.body.color;
         // let director = req.body.director;
-        let dir_id = req.body.dir_id;
+        let director_id = req.body.director_id;
 
         // hon e3mal check 3la el dir_id or director
 
@@ -114,10 +114,10 @@ router.post('/addMovie', (req, res) => {
 
 
         connection.query("INSERT INTO movies \
-    (title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, director, color, dir_id) \
+    (title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, director, color, director_id) \
      VALUES \
-     (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT name FROM directors WHERE director_id = ? LIMIT 1), ?,?)",
-            [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes,  dir_id, color, dir_id], function (err, result) {
+     (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT name FROM directors WHERE id = ? LIMIT 1), ?,?)",
+            [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes,  director_id, color, director_id], function (err, result) {
                 if (err) {
                     console.log(err);
 
@@ -162,10 +162,10 @@ router.put('/editAllMovieFields/:id', (req, res) => {
     let imdb_score = req.body.imdb_score;
     let aspect_ratio = req.body.aspect_ratio;
     let movie_facebook_likes = req.body.movie_facebook_likes;
-    let actors = JSON.stringify(req.body.actors);
+    // let actors = JSON.stringify(req.body.actors);
     let color = req.body.color;
     // let director = req.body.director;
-    let dir_id = req.body.dir_id;
+    let director_id = req.body.director_id;
 
     // hon e3mal check 3la el dir_id or director
 
@@ -173,8 +173,8 @@ router.put('/editAllMovieFields/:id', (req, res) => {
 
 
     connection.query("UPDATE movies SET \
-    title = ?, duration = ?, gross = ?, genres = ?, num_voted_users = ?, cast_total_facebook_likes = ?, plot_keywords = ?, imdb_link = ?, num_user_for_reviews = ?, language = ?, country = ?, content_rating = ?, budget = ?, title_year = ?, imdb_score = ?, aspect_ratio = ?, movie_facebook_likes = ?, director = (SELECT name FROM directors WHERE director_id = ? LIMIT 1), color = ?, dir_id = ? WHERE movie_id = ?" ,
-        [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, dir_id, color, dir_id, id], function (err, result) {
+    title = ?, duration = ?, gross = ?, genres = ?, num_voted_users = ?, cast_total_facebook_likes = ?, plot_keywords = ?, imdb_link = ?, num_user_for_reviews = ?, language = ?, country = ?, content_rating = ?, budget = ?, title_year = ?, imdb_score = ?, aspect_ratio = ?, movie_facebook_likes = ?, director = (SELECT name FROM directors WHERE id = ? LIMIT 1), color = ?, director_id = ? WHERE movies.id = ?" ,
+        [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, director_id, color, director_id, id], function (err, result) {
             if (err) {
                 console.log(err);
 
@@ -184,7 +184,7 @@ router.put('/editAllMovieFields/:id', (req, res) => {
             // if(result?.insertId) movieId = result?.insertId
             // let oneMovie = {"name": name, "facebook_likes": facebook_likes}
             // res.json(oneMovie)
-            res.send({ "title": title, "duration": duration, "gross": gross, "num_voted_users": num_voted_users, "cast_total_facebook_likes": cast_total_facebook_likes, "plot_keywords": plot_keywords, "imdb_link": imdb_link, "num_user_for_reviews": num_user_for_reviews, "language": language, "country": country, "content_rating": content_rating, "budget": budget, "title_year": title_year, "imdb_score": imdb_score, "aspect_ratio": aspect_ratio, "movie_facebook_likes": movie_facebook_likes, "actors": actors, "color": color, "dir_id": dir_id })
+            res.send({ "title": title, "duration": duration, "gross": gross, "num_voted_users": num_voted_users, "cast_total_facebook_likes": cast_total_facebook_likes, "plot_keywords": plot_keywords, "imdb_link": imdb_link, "num_user_for_reviews": num_user_for_reviews, "language": language, "country": country, "content_rating": content_rating, "budget": budget, "title_year": title_year, "imdb_score": imdb_score, "aspect_ratio": aspect_ratio, "movie_facebook_likes": movie_facebook_likes, "actors": actors, "color": color, "director_id": director_id })
         });
 
 
@@ -222,11 +222,10 @@ router.put('/editMovie/:id', (req, res) => {
     let imdb_score
     let aspect_ratio
     let movie_facebook_likes
-    let actors
     let color
-    let dir_id
+    let director_id
 
-connection.query(`SELECT * FROM movies WHERE movie_id = ${id}` ,
+connection.query(`SELECT * FROM movies WHERE id = ${id}` ,
       function (err, result) {
             if (err) {
                 console.log(err);
@@ -250,7 +249,7 @@ connection.query(`SELECT * FROM movies WHERE movie_id = ${id}` ,
      req.body.aspect_ratio ? aspect_ratio = req.body.aspect_ratio : aspect_ratio = result[0].aspect_ratio
      req.body.movie_facebook_likes ? movie_facebook_likes = req.body.movie_facebook_likes : movie_facebook_likes = result[0].movie_facebook_likes
      req.body.color ? color = req.body.color : color = result[0].color
-     req.body.dir_id ? dir_id = req.body.dir_id : dir_id = result[0].dir_id
+     req.body.director_id ? director_id = req.body.director_id : director_id = result[0].director_id
 
 
      
@@ -259,14 +258,14 @@ connection.query(`SELECT * FROM movies WHERE movie_id = ${id}` ,
 
 
             connection.query("UPDATE movies SET \
-            title = ?, duration = ?, gross = ?, genres = ?, num_voted_users = ?, cast_total_facebook_likes = ?, plot_keywords = ?, imdb_link = ?, num_user_for_reviews = ?, language = ?, country = ?, content_rating = ?, budget = ?, title_year = ?, imdb_score = ?, aspect_ratio = ?, movie_facebook_likes = ?, director = (SELECT name FROM directors WHERE director_id = ? LIMIT 1), color = ?, dir_id = ? WHERE movie_id = ?" ,
-                [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, dir_id, color, dir_id, id], function (err, result) {
+            title = ?, duration = ?, gross = ?, genres = ?, num_voted_users = ?, cast_total_facebook_likes = ?, plot_keywords = ?, imdb_link = ?, num_user_for_reviews = ?, language = ?, country = ?, content_rating = ?, budget = ?, title_year = ?, imdb_score = ?, aspect_ratio = ?, movie_facebook_likes = ?, director = (SELECT name FROM directors WHERE id = ? LIMIT 1), color = ?, director_id = ? WHERE movies.id = ?" ,
+                [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, director_id, color, director_id, id], function (err, result) {
                     if (err) {
                         console.log(err);
         
                     }
                    
-                    res.send({ "title": title, "duration": duration, "gross": gross, "num_voted_users": num_voted_users, "cast_total_facebook_likes": cast_total_facebook_likes, "plot_keywords": plot_keywords, "imdb_link": imdb_link, "num_user_for_reviews": num_user_for_reviews, "language": language, "country": country, "content_rating": content_rating, "budget": budget, "title_year": title_year, "imdb_score": imdb_score, "aspect_ratio": aspect_ratio, "movie_facebook_likes": movie_facebook_likes, "actors": actors, "color": color, "dir_id": dir_id })
+                    res.send({ "title": title, "duration": duration, "gross": gross, "num_voted_users": num_voted_users, "cast_total_facebook_likes": cast_total_facebook_likes, "plot_keywords": plot_keywords, "imdb_link": imdb_link, "num_user_for_reviews": num_user_for_reviews, "language": language, "country": country, "content_rating": content_rating, "budget": budget, "title_year": title_year, "imdb_score": imdb_score, "aspect_ratio": aspect_ratio, "movie_facebook_likes": movie_facebook_likes,  "color": color, "director_id": director_id })
                 });
         
 
@@ -287,7 +286,7 @@ connection.query(`SELECT * FROM movies WHERE movie_id = ${id}` ,
 
 router.delete('/deleteMovie/:id', (req, res) => {
     let id = req.params.id;
-    connection.query("DELETE FROM movies WHERE movie_id = ?", [id], (err, result) => {
+    connection.query("DELETE FROM movies WHERE id = ?", [id], (err, result) => {
         if (err) throw err;
         res.send("row with this id " + id + " is deleted")
     })

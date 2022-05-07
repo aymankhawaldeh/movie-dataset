@@ -33,7 +33,7 @@ app.get('/passing', (req, res) => {
     let csvStream = csv.parseFile(".\\csv\\movie_metadata.csv", { headers: true })
         .on("data", function (record) {
             csvStream.pause();
-            // if (counter < 100) {
+            if (counter < 100) {
 
                 let title = record.movie_title.trim().replace(/\s/g, "") == "" ? null : record.movie_title.trim()
                 let duration = record.duration.replace(/\s/g, "") == "" ? 0 : record.duration
@@ -94,7 +94,6 @@ app.get('/passing', (req, res) => {
 
 
 
-                let directorId = undefined
                 connection.query("INSERT INTO directors (name, facebook_likes) VALUES (?, ?)", [director, facebook_likes], function (err) {
                     if (err) {
                         console.log(err);
@@ -106,15 +105,14 @@ app.get('/passing', (req, res) => {
 
 
                 connection.query("INSERT INTO movies \
-        (title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, actors, director, color, dir_id) \
+        (title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, actors, director, color, director_id) \
          VALUES \
-         (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT director_id FROM directors WHERE name = ? LIMIT 1))",
+         (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM directors WHERE name = ? LIMIT 1))",
                     [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, actors, director, color, director], function (err, result) {
                         if (err) {
                             console.log(err);
 
                         }
-                        console.log('hoon rr', directorId);
 
                         // if(result?.insertId) movieId = result?.insertId
                     });
@@ -123,11 +121,11 @@ app.get('/passing', (req, res) => {
 
 
                 let movieId = undefined
-                connection.query("SELECT movie_id FROM movies WHERE title = ? ", title, function (err, rows) {
+                connection.query("SELECT id FROM movies WHERE title = ? ", title, function (err, rows) {
                     if (err) {
                         console.log(err);
                     }
-                    movieId = rows[0]?.movie_id
+                    movieId = rows[0]?.id
 
 
 
@@ -138,22 +136,18 @@ app.get('/passing', (req, res) => {
 
 
 
-                let sql = "SELECT actor_id FROM actors WHERE name  IN (" + connection.escape([name1, name2, name3]) + ")";
+                let sql = "SELECT id FROM actors WHERE name  IN (" + connection.escape([name1, name2, name3]) + ")";
                 console.log("sqllll ", sql)
                 connection.query(sql, function (err, rows) {
                     if (err) {
                         console.log(err);
                     }
-                    // console.log('resulttttt' , result)
-                    // console.log('fieldssss' , fields)
-                    // console.log('rowssss' , rows[0]?.actor_id)
-                    // if(rows[0] && rows[0]?.actor_id)  arr.push(rows[0].actor_id)
-                    // console.log('allrows ', rows)
+              
 
                     rows.map((elm) => {
 
 
-                        connection.query("INSERT IGNORE INTO movies_actors (movie_id, actor_id) VALUES (?, ?)", [movieId, elm.actor_id], function (err) {
+                        connection.query("INSERT IGNORE INTO movies_actors (movie_id, actor_id) VALUES (?, ?)", [movieId, elm.id], function (err) {
                             if (err) {
                                 console.log(err);
                             }
@@ -173,8 +167,8 @@ app.get('/passing', (req, res) => {
 
 
 
-            //     ++counter;
-            // }
+                ++counter;
+            }
         }).on("end", function () {
             console.log("Job is done!");
         }).on("error", function (err) {
@@ -206,7 +200,7 @@ app.listen(8000, () => {
 
 
         let createDirectors = `CREATE TABLE IF NOT EXISTS directors (
-            director_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+            id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
             name varchar(45) UNIQUE not null,
             facebook_likes INT
             
@@ -214,7 +208,7 @@ app.listen(8000, () => {
 
 
         let createActors = `CREATE TABLE IF NOT EXISTS actors(
-            actor_id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
+            id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
             name VARCHAR(45) UNIQUE NOT NULL,
             facebook_likes INT,
             age INT,
@@ -224,7 +218,7 @@ app.listen(8000, () => {
 
 
         let createMovies = `CREATE TABLE IF NOT EXISTS movies (
-                movie_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 title VARCHAR(45) UNIQUE NOT NULL,
                 director varchar(45) ,
                 duration INT,
@@ -245,9 +239,9 @@ app.listen(8000, () => {
                 movie_facebook_likes INT,
                 actors JSON,
                 color VARCHAR(15),
-                dir_id INT not null,
-                CONSTRAINT ima
-                FOREIGN KEY(dir_id) REFERENCES directors(director_id)
+                director_id INT not null,
+                CONSTRAINT dir_constr
+                FOREIGN KEY(director_id) REFERENCES directors(id)
                 ON DELETE CASCADE ON UPDATE CASCADE
                 
                 
@@ -259,11 +253,11 @@ app.listen(8000, () => {
        movie_id INT NOT NULL,
        actor_id INT NOT NULL,
        PRIMARY KEY (movie_id, actor_id),
-       CONSTRAINT kmc
-       FOREIGN KEY(movie_id) REFERENCES movies(movie_id)
+       CONSTRAINT mov_constr
+       FOREIGN KEY(movie_id) REFERENCES movies(id)
        ON DELETE CASCADE ON UPDATE CASCADE,
-       CONSTRAINT apx
-       FOREIGN KEY(actor_id) REFERENCES actors(actor_id)
+       CONSTRAINT act_constr
+       FOREIGN KEY(actor_id) REFERENCES actors(id)
        ON DELETE CASCADE ON UPDATE CASCADE
        
        );`

@@ -45,7 +45,7 @@ router.post('/addActorsMovies', (req, res) => {
             
 
       
-            connection.query("SELECT actors from movies WHERE movie_id = ? ", [movie_id], (err, result, rows, fields) => {
+            connection.query("SELECT actors from movies WHERE id = ? ", [movie_id], (err, result, rows, fields) => {
                 if (err) {
                     throw err;
                 }
@@ -76,7 +76,7 @@ router.post('/addActorsMovies', (req, res) => {
             })
 
 
-            connection.query("SELECT name from actors WHERE actor_id = ? ", [actor_id], (err, result, rows, fields) => {
+            connection.query("SELECT name from actors WHERE id = ? ", [actor_id], (err, result, rows, fields) => {
                 if (err) {
                     reject(err);
                 }
@@ -91,7 +91,7 @@ router.post('/addActorsMovies', (req, res) => {
         console.log('arr', arr)
         actors = JSON.stringify(arr)
 
-        connection.query("UPDATE movies SET actors = ? WHERE movie_id = ? ", [actors, movie_id], (err, result, rows, fields) => {
+        connection.query("UPDATE movies SET actors = ? WHERE id = ? ", [actors, movie_id], (err, result, rows, fields) => {
             if (err) throw err;
         })
 
@@ -117,7 +117,7 @@ router.post('/addActorsMovies', (req, res) => {
 
 
 
-router.delete('/deleteSomeMovieActor/:movie_id/:actor_id', (req, res) => {
+router.delete('/deleteSomeMovieActor', (req, res) => {
     let arr= [];
     let newArr = [];
     let movie_id = req.query.movie_id;
@@ -139,13 +139,12 @@ router.delete('/deleteSomeMovieActor/:movie_id/:actor_id', (req, res) => {
                 
 
           
-                connection.query("SELECT actors from movies WHERE movie_id = ? ", [movie_id], (err, result, rows, fields) => {
+                connection.query("SELECT actors from movies WHERE movies.id = ? ", [movie_id], (err, result, rows, fields) => {
                     if (err) {
                         throw err;
                     }
                     console.log('rows out', rows)
                     console.log('result out', result)
-                    console.log('field out', fields)
 
                   
 
@@ -165,7 +164,7 @@ router.delete('/deleteSomeMovieActor/:movie_id/:actor_id', (req, res) => {
                 })
 
 
-                connection.query("SELECT name from actors WHERE actor_id = ? ", [actor_id], (err, result, rows, fields) => {
+                connection.query("SELECT name from actors WHERE id = ? ", [actor_id], (err, result, rows, fields) => {
                     if (err) {
                         reject(err);
                     }
@@ -190,7 +189,7 @@ router.delete('/deleteSomeMovieActor/:movie_id/:actor_id', (req, res) => {
             console.log('newArr', newArr)
             actors = JSON.stringify(newArr)
 
-            connection.query("UPDATE movies SET actors = ? WHERE movie_id = ? ", [actors, movie_id], (err, result, rows, fields) => {
+            connection.query("UPDATE movies SET actors = ? WHERE id = ? ", [actors, movie_id], (err, result, rows, fields) => {
                 if (err) throw err;
             })
 

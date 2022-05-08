@@ -13,9 +13,9 @@ var connection = require('../database')
 
 router.get('/movies', (req, res) => {
 
-    connection.query("SELECT * from movies", (err, rows, fields, result) => {
+    connection.query("SELECT * from movies", (err, rows, fields, result, records) => {
         if (err) throw err;
-        res.send(rows);
+        res.status(200).json({movies: rows});
     })
 });
 

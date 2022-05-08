@@ -33,7 +33,7 @@ app.get('/passing', (req, res) => {
     let csvStream = csv.parseFile(".\\csv\\movie_metadata.csv", { headers: true })
         .on("data", function (record) {
             csvStream.pause();
-             if (counter < 100) {
+             if (counter < 75) {
 
                 let title = record.movie_title.trim().replace(/\s/g, "") == "" ? null : record.movie_title.trim()
                 let duration = record.duration.replace(/\s/g, "") == "" ? 0 : record.duration
@@ -52,7 +52,6 @@ app.get('/passing', (req, res) => {
                 let imdb_score = record.imdb_score.replace(/\s/g, "") == "" ? 0 : record.imdb_score;
                 let aspect_ratio = record.aspect_ratio.replace(/\s/g, "") == "" ? 0 : record.aspect_ratio
                 let movie_facebook_likes = record.movie_facebook_likes.replace(/\s/g, "") == "" ? 0 : record.movie_facebook_likes;
-                let actors = JSON.stringify([record.actor_1_name, record.actor_2_name, record.actor_3_name]);
                 let director = record.director_name.replace(/\s/g, "") == "" ? null : record.director_name
                 let color = record.color.replace(/\s/g, "") == "" ? null : record.color
                 let name1 = record.actor_1_name.replace(/\s/g, "") == "" ? null : record.actor_1_name
@@ -105,10 +104,10 @@ app.get('/passing', (req, res) => {
 
 
                 connection.query("INSERT INTO movies \
-        (title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, actors, director, color, director_id) \
+        (title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, color, director_id) \
          VALUES \
-         (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM directors WHERE name = ? LIMIT 1))",
-                    [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, actors, director, color, director], function (err, result) {
+         (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM directors WHERE name = ? LIMIT 1))",
+                    [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, color, director], function (err, result) {
                         if (err) {
                             console.log(err);
 
@@ -209,17 +208,13 @@ app.listen(8000, () => {
         let createActors = `CREATE TABLE IF NOT EXISTS actors(
             id INT PRIMARY KEY NOT NULL AUTO_INCREMENT,
             name VARCHAR(45) UNIQUE NOT NULL,
-            facebook_likes INT,
-            age INT,
-            facebook_page_link VARCHAR(255)
-            );`
+            facebook_likes INT            );`
 
 
 
         let createMovies = `CREATE TABLE IF NOT EXISTS movies (
                 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
                 title VARCHAR(45) UNIQUE NOT NULL,
-                director varchar(45) ,
                 duration INT,
                 gross DECIMAL,
                 genres JSON,
@@ -236,12 +231,9 @@ app.listen(8000, () => {
                 imdb_score float,
                 aspect_ratio double,
                 movie_facebook_likes INT,
-                actors JSON,
                 color VARCHAR(15),
                 director_id INT not null,
-                CONSTRAINT dir_constr
                 FOREIGN KEY(director_id) REFERENCES directors(id)
-                ON DELETE CASCADE ON UPDATE CASCADE
                 
                 
                 );`
@@ -252,13 +244,8 @@ app.listen(8000, () => {
        movie_id INT NOT NULL,
        actor_id INT NOT NULL,
        PRIMARY KEY (movie_id, actor_id),
-       CONSTRAINT mov_constr
-       FOREIGN KEY(movie_id) REFERENCES movies(id)
-       ON DELETE CASCADE ON UPDATE CASCADE,
-       CONSTRAINT act_constr
+       FOREIGN KEY(movie_id) REFERENCES movies(id),
        FOREIGN KEY(actor_id) REFERENCES actors(id)
-       ON DELETE CASCADE ON UPDATE CASCADE
-       
        );`
 
 

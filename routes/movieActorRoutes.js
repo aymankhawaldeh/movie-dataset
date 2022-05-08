@@ -51,7 +51,6 @@ router.post('/addActorsMovies', (req, res) => {
                 }
                 console.log('rows out', rows)
                 console.log('result out', result)
-                console.log('field out', fields)
 
 
                  if(result[0].actors){
@@ -206,19 +205,6 @@ router.delete('/deleteSomeMovieActor', (req, res) => {
 
 
 
-router.delete('/deleteAllMoviesActors', (req, res) => {
-    let movie_id = req.query.movie_id;
-    let actor_id = req.query.actor_id;
-
-    connection.query("DELETE FROM movies_actors WHERE movie_id = ? OR actor_id = ?", [movie_id, actor_id], (err, result) => {
-        if (err) throw err;
-        // console.log(" all actors id ", actor)
-        res.status(200).send("row is deleted")
-
-
-    })
-    // reminder: I sould do here delete from movies actors later
-})
 
 
 

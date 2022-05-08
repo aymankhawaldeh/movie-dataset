@@ -22,7 +22,7 @@ router.get('/movies', (req, res) => {
 
 
 
-router.get('/one-movie/:id', (req, res) => {
+router.get('/getMovie/:id', (req, res) => {
     let id = req.params.id;
     connection.query("SELECT * FROM movies WHERE id = ?", [id], (err, rows, fields, result) => {
         if (err) throw err;

@@ -33,7 +33,7 @@ app.get('/passing', (req, res) => {
     let csvStream = csv.parseFile(".\\csv\\movie_metadata.csv", { headers: true })
         .on("data", function (record) {
             csvStream.pause();
-            if (counter < 100) {
+             if (counter < 100) {
 
                 let title = record.movie_title.trim().replace(/\s/g, "") == "" ? null : record.movie_title.trim()
                 let duration = record.duration.replace(/\s/g, "") == "" ? 0 : record.duration
@@ -137,7 +137,6 @@ app.get('/passing', (req, res) => {
 
 
                 let sql = "SELECT id FROM actors WHERE name  IN (" + connection.escape([name1, name2, name3]) + ")";
-                console.log("sqllll ", sql)
                 connection.query(sql, function (err, rows) {
                     if (err) {
                         console.log(err);

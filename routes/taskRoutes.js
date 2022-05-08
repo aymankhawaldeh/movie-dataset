@@ -88,7 +88,7 @@ router.get('/movie/search', (req, res) => {
 })
 
 
-// 2)
+// 2) a)
 router.get('/movie/count', (req, res) => {
 
 
@@ -106,6 +106,26 @@ router.get('/movie/count', (req, res) => {
 
     })
 })
+
+// 2) b)
+// router.get('/movie/count', (req, res) => {
+
+
+//     connection.query(`  SELECT  count(title) as 'number of movies',  ifnull(language, 'no language') as 'languages', ifnull(country, 'no country') as 'countries', if(max(imdb_score) - min(imdb_score) = 0, max(imdb_score), concat(min(imdb_score),'-',max(imdb_score))) as 'imdb_score'  from movies group by language, country
+//     `, (err, result, rows) => {
+//         if (err) throw err;
+
+//         // console.log(" all actors id ", actor)
+//         console.log("result", result)
+
+//         // console.log("rows", rows)
+//         res.status(200).send(result)
+
+
+
+//     })
+// })
+
 
 
 // 3)

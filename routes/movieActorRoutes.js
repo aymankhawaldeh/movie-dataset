@@ -58,7 +58,7 @@ router.post('/addActorsMovies', (req, res) => {
                 //   console.log("REsult", result)
 
               
-
+                    
                     console.log("All RESULT$ ", result)
                     console.log("RESULT[0].ACTORS$ ", result[0].actors)
                     let data = JSON.parse(result[0].actors);

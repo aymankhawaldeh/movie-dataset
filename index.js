@@ -233,7 +233,9 @@ app.listen(8000, () => {
                 movie_facebook_likes INT,
                 color VARCHAR(15),
                 director_id INT not null,
+                CONSTRAINT di_co
                 FOREIGN KEY(director_id) REFERENCES directors(id)
+                ON DELETE CASCADE ON UPDATE CASCADE
                 
                 
                 );`
@@ -244,8 +246,12 @@ app.listen(8000, () => {
        movie_id INT NOT NULL,
        actor_id INT NOT NULL,
        PRIMARY KEY (movie_id, actor_id),
-       FOREIGN KEY(movie_id) REFERENCES movies(id),
+       CONSTRAINT mov_co
+       FOREIGN KEY(movie_id) REFERENCES movies(id)
+       ON DELETE CASCADE ON UPDATE CASCADE,
+       CONSTRAINT act_co
        FOREIGN KEY(actor_id) REFERENCES actors(id)
+       ON DELETE CASCADE ON UPDATE CASCADE
        );`
 
 

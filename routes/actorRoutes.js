@@ -165,7 +165,7 @@ router.put('/editActor/:id', [
 
             } else {
 
-                connection.query("SELECT * from  actors where name = ? ", [name], (err, result) => {
+                connection.query("SELECT * from  actors where name = ? AND id != ? ", [name, id], (err, result) => {
                     if (err) {
                         console.log(err.message)
                         res.status(500).send('Server Error');

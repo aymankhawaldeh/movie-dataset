@@ -151,7 +151,7 @@ router.put('/editDirector/:id', [
 
             } else {
 
-                connection.query("SELECT * from  directors where name = ? ", [name], (err, result) => {
+                connection.query("SELECT * from  directors where name = ? AND id != ?", [name, id], (err, result) => {
                     if (err) {
                         console.log(err.message)
                         res.status(500).send('Server Error');

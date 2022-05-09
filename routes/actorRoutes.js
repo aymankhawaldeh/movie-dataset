@@ -27,7 +27,7 @@ router.get('/actors', (req, res) => {
 
 
 
-router.get('/actor/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt().withMessage('id must be an Integer number')], (req, res) => {
+router.get('/actor/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be an Integer number')], (req, res) => {
     let id = req.params.id;
  
     const errors = validationResult(req);
@@ -130,7 +130,7 @@ router.post('/addActor', [
 
 
 router.put('/editActor/:id', [
-    check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' '}), check('name', 'Name is required').not().isEmpty(), check('facebook_likes').isInt().withMessage('facebook_likes must be an Integer number'), check('facebook_likes').not().isString().withMessage('facebook_likes must be an Integer number'), check('id').not().isEmpty().withMessage('you must identify the id for the data'),  check('id').isInt().withMessage('id must be an Integer number')], (req, res) => {
+    check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' '}), check('name', 'Name is required').not().isEmpty(), check('facebook_likes').isInt().withMessage('facebook_likes must be an Integer number'), check('facebook_likes').not().isString().withMessage('facebook_likes must be an Integer number'), check('id').not().isEmpty().withMessage('you must identify the id for the data'),  check('id').isInt({ gt: -1 }).withMessage('id must be an Integer number')], (req, res) => {
 
 
     let id = req.params.id
@@ -213,7 +213,7 @@ router.put('/editActor/:id', [
 // DELETE ROUTES
 
 
-router.delete('/deleteActor/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'),  check('id').isInt().withMessage('id must be an Integer number')], (req, res) => {
+router.delete('/deleteActor/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'),  check('id').isInt({ gt: -1 }).withMessage('id must be an Integer number')], (req, res) => {
     let id = req.params.id;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

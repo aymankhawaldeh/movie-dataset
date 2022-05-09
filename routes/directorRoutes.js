@@ -29,7 +29,7 @@ router.get('/directors', (req, res) => {
 
 
 
-router.get('/director/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt().withMessage('id must be an Integer number')], (req, res) => {
+router.get('/director/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be an Integer number')], (req, res) => {
     let id = req.params.id;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -119,7 +119,7 @@ router.post('/addDirector', [
 
 
 router.put('/editDirector/:id', [
-    check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' '}), check('name', 'Name is required').not().isEmpty(), check('facebook_likes').isInt().withMessage('facebook_likes must be an Integer number'), check('facebook_likes').not().isString().withMessage('facebook_likes must be an Integer number'), check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt().withMessage('id must be an Integer number')], (req, res) => {
+    check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' '}), check('name', 'Name is required').not().isEmpty(), check('facebook_likes').isInt().withMessage('facebook_likes must be an Integer number'), check('facebook_likes').not().isString().withMessage('facebook_likes must be an Integer number'), check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be an Integer number')], (req, res) => {
 
 
         let id = req.params.id
@@ -206,7 +206,7 @@ router.put('/editDirector/:id', [
 // DELETE ROUTES
 
 
-router.delete('/deleteDirector/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt().withMessage('id must be an Integer number')],  (req, res) => {
+router.delete('/deleteDirector/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be an Integer number')],  (req, res) => {
     let id = req.params.id;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

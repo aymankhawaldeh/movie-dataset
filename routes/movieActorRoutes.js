@@ -44,7 +44,7 @@ router.get('/getOneMoviesActors',
         let actor_id = req.query.actor_id
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
+            return res.status(400).json({ errors: errors.array() });
         }
 
 
@@ -73,7 +73,7 @@ router.get('/getOneMoviesActors',
 
 router.post('/addActorMovie', [
     check('movie_id').not().isEmpty().withMessage('you must identify movie_id'), check('movie_id').isInt({ gt: -1 }).withMessage('movie_id must be an Integer number'),
-    check('actor_id').not().isEmpty().withMessage('you must identify actor_id'), check('actor_id').isInt({ gt: -1 }).withMessage('actor_id must be an Integer number'),
+    check('actor_id').not().isEmpty().withMessage('you must identify actor_id'), check('actor_id').isInt({ gt: -1 }).withMessage('actor_id must be an Integer number')
 
 ], (req, res) => {
 
@@ -158,27 +158,35 @@ router.post('/addActorMovie', [
 
 
 
-router.delete('/deleteMovieActor', (req, res) => {
+router.delete('/deleteMovieActor', [
+    check('movie_id').not().isEmpty().withMessage('you must identify movie_id'), check('movie_id').isInt({ gt: -1 }).withMessage('movie_id must be an Integer number'),
+    check('actor_id').not().isEmpty().withMessage('you must identify actor_id'), check('actor_id').isInt({ gt: -1 }).withMessage('actor_id must be an Integer number')
+
+], (req, res) => {
 
     let movie_id = req.query.movie_id;
     let actor_id = req.query.actor_id;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
+    }
 
     connection.query("SELECT movie_id, actor_id from movies_actors WHERE movie_id = ? AND actor_id = ?", [movie_id, actor_id], (err, result, rows, fields) => {
         if (err) {
-            throw err;
+            console.log(err.message)
+            res.status(500).send('Server Error');
         }
-        console.log(result.length)
+
         if (result.length == 0) {
-            res.send('SORRY THIS RELATION IS not EXIST')
-
-
-
+            return res.status(404).json({ msg: 'This relation is not exist' })
         } else {
 
             connection.query("DELETE FROM movies_actors WHERE movie_id = ? AND actor_id = ?", [movie_id, actor_id], (err, result) => {
-                if (err) throw err;
-                // console.log(" all actors id ", actor)
-                res.status(200).send("row is deleted")
+                if (err) {
+                    console.log(err.message)
+                    res.status(500).send('Server Error');
+                }
+                res.status(200).json({ msg: 'relation  removed' });
 
 
             })

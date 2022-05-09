@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const { check, validationResult } = require('express-validator')
 var connection = require('../database')
 
 
@@ -9,18 +10,44 @@ var connection = require('../database')
 router.get('/actors', (req, res) => {
 
     connection.query("SELECT * from actors", (err, rows, fields, result) => {
-        if (err) throw err;
-        res.send(rows);
+        if (err) {
+            console.log(err.message)
+            res.status(500).send('Server Error');
+
+        }
+        if(rows.length == 0){
+            return res.status(404).json({msg: 'No Actors found'})
+
+        } else {
+        res.status(200).send(rows)
+        }  
     })
 });
 
 
 
-router.get('/actor/:id', (req, res) => {
+
+router.get('/actor/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt().withMessage('id must be an Integer number')], (req, res) => {
     let id = req.params.id;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+
+
     connection.query("SELECT * FROM actors WHERE id = ?", [id], (err, rows, fields, result) => {
-        if (err) throw err;
-        res.send(rows)
+        if (err) {
+            console.log(err.message)
+            res.status(500).send('Server Error');
+
+        }
+        if(rows.length == 0){
+            return res.status(404).json({msg: 'Actor not found'})
+
+        } else {
+        res.status(200).send(rows[0])
+        }
     })
 })
 
@@ -28,7 +55,11 @@ router.get('/actor/:id', (req, res) => {
 // router.get('/actorByName/:name', (req,res) =>{
 //     let name = req.params.name;
 //     connection.query("SELECT * FROM actors WHERE name = ?", [name], (err, rows, fields, result) =>{
-//         if(err) throw err;
+//            if (err) {
+//     console.log(err.message)
+//     res.status(500).send('Server Error');
+
+// }
 //         res.send(rows)
 //     })
 // })
@@ -41,57 +72,51 @@ router.get('/actor/:id', (req, res) => {
 
 
 
-router.post('/addActor', (req, res) => {
+router.post('/addActor', [
+    check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' '}), check('name', 'Name is required').not().isEmpty(), check('facebook_likes').isInt().withMessage('facebook_likes must be an Integer number'), check('facebook_likes').not().isString().withMessage('facebook_likes must be an Integer number') ],(req, res) => {
+  
+        let name = req.body.name;
+        let facebook_likes = req.body.facebook_likes;
+        let obj ={
+            Status: 'Actor Created Successfully',
+            Data: req.body
+   };
 
+   const errors = validationResult(req);
+   if (!errors.isEmpty()) {
+     return res.status(400).json({ errors: errors.array() });
+   }
 
+    connection.query("SELECT * from  actors where name = ? ", [name], (err, result, rows, fields) => {
+    if (err) {
+        console.log(err.message)
+        res.status(500).send('Server Error');
 
-    let multiActors = []
+    }
 
-
-    if (req.body.length > 1) {
-        console.log('request.body multi out', req.body)
-
-        for (var key in req.body) {
-            if (req.body.hasOwnProperty(key)) {
-                let value = req.body[key];
-                multiActors.push(value)
-
-                connection.query("INSERT INTO actors (name, facebook_likes) VALUES (?,?) ", [value.name, value.facebook_likes], (err, result, rows, fields) => {
-                    if (err) throw err;
-
-                })
-
-                console.log('request.body in', req.body)
-
-                console.log(`value for ${key} is ${value.name}`);
-
-
+    if (result.length == 0) {
+        connection.query("INSERT INTO actors (name, facebook_likes) VALUES (?,?) ", [name, facebook_likes], (err, result, rows, fields) => {
+            if (err) {
+                console.log(err.message)
+                res.status(500).send('Server Error');
 
             }
 
-
-
-
-
-        }
-
-        res.status(200).json(multiActors)
-
-    } else {
-        let name = req.body.name;
-        let facebook_likes = req.body.facebook_likes;
-
-        connection.query("INSERT INTO actors (name, facebook_likes) VALUES (?,?) ", [name, facebook_likes], (err, result, rows, fields) => {
-            if (err) throw err;
-
-            let oneActor = { "name": name, "facebook_likes": facebook_likes }
-            res.json(oneActor)
+            console.log(obj)
+            res.status(201).json(obj)
 
         })
-        console.log('request.body one', req.body)
 
+    } else {
+        return res.status(400).json({ msg: 'Actor already exists' })
 
     }
+
+
+
+})
+
+    
 })
 
 
@@ -103,19 +128,80 @@ router.post('/addActor', (req, res) => {
 
 
 
-router.put('/editActor/:id', (req, res) => {
+router.put('/editActor/:id', [
+    check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' '}), check('name', 'Name is required').not().isEmpty(), check('facebook_likes').isInt().withMessage('facebook_likes must be an Integer number'), check('facebook_likes').not().isString().withMessage('facebook_likes must be an Integer number'), check('id').not().isEmpty().withMessage('you must identify the id for the data'),  check('id').isInt().withMessage('id must be an Integer number')], (req, res) => {
 
 
     let id = req.params.id
     let name = req.body.name;
     let facebook_likes = req.body.facebook_likes;
+    let obj = {
+        Status: 'Actor Updated Successfully',
+        Data: req.body
+    };
 
 
-    connection.query("UPDATE actors SET name = ? , facebook_likes = ? WHERE id = ? ", [name, facebook_likes, id], (err, result) => {
-        if (err) throw err;
-        console.log(result)
-        res.send({ "name": name, "facebook_likes": facebook_likes })
-    })
+    
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+
+
+
+    connection.query("SELECT * from  actors where id = ? ", [id], (err, result, rows, fields) => {
+        if (err) {
+            console.log(err.message)
+            res.status(500).send('Server Error');
+
+        }
+
+            if (result.length == 0) {
+                return res.status(404).json({ msg: 'Actor not exists' })
+
+
+
+            } else {
+
+                connection.query("SELECT * from  actors where name = ? ", [name], (err, result) => {
+                    if (err) {
+                        console.log(err.message)
+                        res.status(500).send('Server Error');
+    
+                    }
+                    if (result.length == 0) {
+                        connection.query("UPDATE  actors SET name = ? , facebook_likes = ? WHERE id = ? ", [name, facebook_likes, id], (err, result) => {
+                            if (err) {
+                                console.log(err.message)
+                                res.status(500).send('Server Error');
+            
+                            }
+                            console.log(obj)
+                            res.status(200).json(obj)
+                        })
+
+
+
+                    } else {
+                        return res.status(400).json({ msg: 'Actor with that name already exists' })
+
+                    }
+                })
+
+
+
+
+            }
+
+
+
+
+
+
+
+
+        })
 
 });
 
@@ -126,11 +212,28 @@ router.put('/editActor/:id', (req, res) => {
 // DELETE ROUTES
 
 
-router.delete('/deleteActor/:id', (req, res) => {
+router.delete('/deleteActor/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'),  check('id').isInt().withMessage('id must be an Integer number')], (req, res) => {
     let id = req.params.id;
-    connection.query("DELETE FROM actors WHERE id = ?", [id], (err, result) => {
-        if (err) throw err;
-        res.send("row with this id " + id + " is deleted")
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
+     connection.query("Select * FROM actors WHERE id = ?", [id], (err, result) => {
+        if (result.length == 0) {
+            return res.status(404).json({ msg: 'Actor not found' })
+
+        } else {
+
+            connection.query("DELETE FROM actors WHERE id = ?", [id], (err, result) => {
+                if (err) {
+                    console.log(err.message)
+                    res.status(500).send('Server Error');
+
+                }
+                res.status(200).json({ msg: 'Actor removed' });
+            })
+        }
     })
 })
 

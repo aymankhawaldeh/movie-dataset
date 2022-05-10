@@ -30,7 +30,7 @@
         },
         "responses": {
           "200": {
-            "description": "ok",
+            "description": "Auto generated using Swagger Inspector",
             "content": {
               "application/json; charset=utf-8": {
                 "schema": {
@@ -95,9 +95,23 @@
         }
       ]
     },
-    "/api/actor/1": {
-      "get": {
-        "description": "in this route /api/actor/:id you can get and actor by his ID",
+    "/api/editDirector/1": {
+      "put": {
+        "description": "in this route /api/editDirector/:id you can edit a director by his ID",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/editDirector_1_body"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\n    \"name\": \"Ayman\",\n    \"facebook_likes\": 500\n}"
+                }
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "Auto generated using Swagger Inspector",
@@ -471,6 +485,76 @@
         }
       ]
     },
+    "/api/addDirector": {
+      "post": {
+        "description": "in this route /api/addDirector you can add a new director",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/api_addDirector_body"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\n    \"name\": \"Ayman Khawaldeh\",\n    \"facebook_likes\": 50000\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/director/1": {
+      "get": {
+        "description": "in this route you can get a director by its ID.",
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
     "/api/movie/count": {
       "get": {
         "description": "in this route /api/movie/count you can get the number of movies depend on the language and country and score",
@@ -531,9 +615,37 @@
         }
       ]
     },
+    "/api/deleteDirector/5": {
+      "delete": {
+        "description": "in this route /api/deleteDirector/:id you can delete and director by its ID.",
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
     "/api/editActor/10": {
       "put": {
-        "description": "in this route /api/editActor/:id you can edit any actor data by it's ID",
+        "description": "in this route /api/editActor/:id you can edit any actor data by its ID",
         "requestBody": {
           "content": {
             "application/json": {
@@ -595,7 +707,7 @@
     },
     "/api/addActor": {
       "post": {
-        "description": "in this route /api/addActor you can add a new avtor",
+        "description": "in this route /api/addActor you can add a new actor",
         "requestBody": {
           "content": {
             "application/json": {
@@ -774,6 +886,17 @@
           }
         }
       },
+      "editDirector_1_body": {
+        "type": "object",
+        "properties": {
+          "facebook_likes": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "api_addActorMovie_body": {
         "type": "object",
         "properties": {
@@ -782,6 +905,17 @@
           },
           "movie_id": {
             "type": "integer"
+          }
+        }
+      },
+      "api_addDirector_body": {
+        "type": "object",
+        "properties": {
+          "facebook_likes": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
           }
         }
       },

@@ -60,7 +60,7 @@ router.get('/getOneMoviesActors',
                 return res.status(404).json({ msg: 'No relation found' })
 
             } else {
-                res.status(200).send(result)
+                res.status(200).send(result[0])
             }
         })
 

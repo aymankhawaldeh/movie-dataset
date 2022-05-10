@@ -9,6 +9,8 @@ var connection = require('../database')
 
 // GET ROUTES
 
+
+
 router.get('/directors', (req, res) => {
 
     connection.query("SELECT * from directors", (err, rows, fields, result) => {
@@ -119,12 +121,14 @@ router.post('/addDirector', [
 
 
 router.put('/editDirector/:id', [
-    check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' '}), check('name', 'Name is required').not().isEmpty(), check('facebook_likes').isInt().withMessage('facebook_likes must be an Integer number'), check('facebook_likes').not().isString().withMessage('facebook_likes must be an Integer number'), check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be an Integer number')], (req, res) => {
+    check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' '}), check('name', 'Name is required').not().isEmpty(), check('facebook_likes').optional().isInt().withMessage('facebook_likes must be an Integer number'), check('facebook_likes').optional().not().isString().withMessage('facebook_likes must be an Integer number'), check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be an Integer number')], (req, res) => {
 
 
         let id = req.params.id
         let name = req.body.name;
-        let facebook_likes = req.body.facebook_likes;
+        let facebook_likes;
+       req.body.facebook_likes ? facebook_likes = req.body.facebook_likes : facebook_likes =  0
+
         let obj = {
             Status: 'Director Updated Successfully',
             Data: req.body
@@ -219,7 +223,7 @@ router.delete('/deleteDirector/:id', [check('id').not().isEmpty().withMessage('y
 
         } else {
 
-            connection.query("DELETE FROM dirctor WHERE id = ?", [id], (err, result) => {
+            connection.query("DELETE FROM directors WHERE id = ?", [id], (err, result) => {
                 if (err) {
                     console.log(err.message)
                     res.status(500).send('Server Error');

@@ -69,7 +69,7 @@ router.get('/getMovie/:id', [check('id').not().isEmpty().withMessage('you must i
 
 router.post('/addMovie',
     [
-        check('title', 'Title must be Alpha or alpha and numbers AND not empty').isString(),
+        check('title', 'Title must be Alpha or alpha and numbers and symbols AND not empty').isString(),
         check('title', 'Title is required').not().isEmpty(),
 
         check('duration').isInt({ gt: -1 }).withMessage('Duration must be an Integer number and not less than 0'),
@@ -252,68 +252,68 @@ router.put('/editMovie/:id',
 
         check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be an Integer number'),
 
-        check('title', 'Title must be Alpha or alpha and numbers AND not empty').isString(),
+        check('title', 'Title must be Alpha or alpha and numbers AND not empty').optional().isString(),
         check('title', 'Title is required').not().isEmpty(),
 
-        body('duration').isInt({ gt: -1 }).withMessage('Duration must be an Integer number and not less than 0'),
-        body('duration').not().isString().withMessage('duration must be an Integer number'),
+        body('duration').optional().isInt({ gt: -1 }).withMessage('Duration must be an Integer number and not less than 0'),
+        body('duration').optional().not().isString().withMessage('duration must be an Integer number'),
 
-        check('gross').isNumeric({ gt: -1 }).withMessage('gross must be a number and not less than 0'),
-        check('gross').not().isString().withMessage('gross must be a number'),
+        check('gross').optional().isNumeric({ gt: -1 }).withMessage('gross must be a number and not less than 0'),
+        check('gross').optional().not().isString().withMessage('gross must be a number'),
 
-        check('genres').isArray().withMessage('genres must be an array'),
+        check('genres').optional().isArray().withMessage('genres must be an array'),
 
-        check('num_voted_users').isInt({ gt: -1 }).withMessage('num_voted_users must be an Integer number and not less than 0'),
-        check('num_voted_users').not().isString().withMessage('num_voted_users must be an Integer number'),
-
-
-        check('cast_total_facebook_likes').isInt({ gt: -1 }).withMessage('cast_total_facebook_likes must be an Integer number and not less than 0'),
-        check('cast_total_facebook_likes').not().isString().withMessage('cast_total_facebook_likes must be an Integer number'),
-
-        check('plot_keywords').isArray().withMessage('plot_keywords must be an array'),
-
-        check('imdb_link').isURL().withMessage('imdb_link must be link'),
+        check('num_voted_users').optional().isInt({ gt: -1 }).withMessage('num_voted_users must be an Integer number and not less than 0'),
+        check('num_voted_users').optional().not().isString().withMessage('num_voted_users must be an Integer number'),
 
 
-        check('num_user_for_reviews').isInt({ gt: -1 }).withMessage('num_user_for_reviews must be an Integer number and not less than 0'),
-        check('num_user_for_reviews').not().isString().withMessage('num_user_for_reviews must be an Integer number'),
+        check('cast_total_facebook_likes').optional().isInt({ gt: -1 }).withMessage('cast_total_facebook_likes must be an Integer number and not less than 0'),
+        check('cast_total_facebook_likes').optional().not().isString().withMessage('cast_total_facebook_likes must be an Integer number'),
+
+        check('plot_keywords').optional().isArray().withMessage('plot_keywords must be an array'),
+
+        check('imdb_link').optional().isURL().withMessage('imdb_link must be link'),
 
 
-        check('language', 'language must be Alpha').isAlpha('en-US', { ignore: ' ' }),
-
-        check('country', 'country must be Alpha').isAlpha('en-US', { ignore: ' ' }),
-
-        check('content_rating', 'content_rating can only contain  Alpha  or numbers or spacies').isString(),
+        check('num_user_for_reviews').optional().isInt({ gt: -1 }).withMessage('num_user_for_reviews must be an Integer number and not less than 0'),
+        check('num_user_for_reviews').optional().not().isString().withMessage('num_user_for_reviews must be an Integer number'),
 
 
+        check('language', 'language must be Alpha').optional().isAlpha('en-US', { ignore: ' ' }),
 
-        check('budget').isNumeric({ gt: -1 }).withMessage('budget must be a number and not less than 0'),
-        check('budget').not().isString().withMessage('budget must be a number'),
+        check('country', 'country must be Alpha').optional().isAlpha('en-US', { ignore: ' ' }),
 
-        check('title_year').isInt({ min: 1900, max: 2022 }).withMessage('title_year must be a real year between( 1990 - 2022)'),
+        check('content_rating', 'content_rating must be string').optional().isString(),
 
 
 
+        check('budget').optional().isNumeric({ gt: -1 }).withMessage('budget must be a number and not less than 0'),
+        check('budget').optional().not().isString().withMessage('budget must be a number'),
 
-        check('imdb_score').isNumeric({ gt: -1 }).withMessage('imdb_score must be a number and not less than 0'),
-        check('imdb_score').not().isString().withMessage('imdb_score must be a number'),
-
-        check('aspect_ratio').isNumeric({ gt: -1 }).withMessage('aspect_ratio must be a number and not less than 0'),
-        check('aspect_ratio').not().isString().withMessage('aspect_ratio must be a number'),
+        check('title_year').optional().isInt({ min: 1900, max: 2022 }).withMessage('title_year must be a real year between( 1990 - 2022)'),
 
 
 
-        check('movie_facebook_likes').isInt({ gt: -1 }).withMessage('movie_facebook_likes must be an Integer number and not less than 0'),
-        check('movie_facebook_likes').not().isString().withMessage('movie_facebook_likes must be an Integer number'),
+
+        check('imdb_score').optional().isNumeric({ gt: -1 }).withMessage('imdb_score must be a number and not less than 0'),
+        check('imdb_score').optional().not().isString().withMessage('imdb_score must be a number'),
+
+        check('aspect_ratio').optional().isNumeric({ gt: -1 }).withMessage('aspect_ratio must be a number and not less than 0'),
+        check('aspect_ratio').optional().not().isString().withMessage('aspect_ratio must be a number'),
 
 
-        check('color', 'color must be Alpha').isAlpha('en-US', { ignore: ' ' }),
 
-        check('director_id').not().isString().withMessage('director_id must be an Integer number'),
+        check('movie_facebook_likes').optional().isInt({ gt: -1 }).withMessage('movie_facebook_likes must be an Integer number and not less than 0'),
+        check('movie_facebook_likes').optional().not().isString().withMessage('movie_facebook_likes must be an Integer number'),
+
+
+        check('color', 'color must be Alpha').optional().isAlpha('en-US', { ignore: ' ' }),
+
+        check('director_id').optional().not().isString().withMessage('director_id must be an Integer number'),
 
 
         check('director_id').not().isEmpty().withMessage('you must identify director_id'),
-        check('director_id').isInt().withMessage('id must be an Integer number')
+        check('director_id').optional().isInt().withMessage('director_id must be an Integer number')
 
 
     ]
@@ -322,22 +322,31 @@ router.put('/editMovie/:id',
 
         let id = req.params.id
         let title = req.body.title;
-        let duration = req.body.duration;
-        let gross = req.body.gross;
+        let duration
+        req.body.duration ? duration = req.body.duration : duration =  0
+        let gross 
+        req.body.gross ? gross = req.body.gross : gross =  0
         let genres = JSON.stringify(req.body.genres);
-        let num_voted_users = req.body.num_voted_users;
-        let cast_total_facebook_likes = req.body.cast_total_facebook_likes;
+        let num_voted_users 
+        req.body.num_voted_users ? num_voted_users = req.body.num_voted_users : num_voted_users =  0
+        let cast_total_facebook_likes 
+        req.body.cast_total_facebook_likes ? cast_total_facebook_likes = req.body.cast_total_facebook_likes : cast_total_facebook_likes =  0
         let plot_keywords = JSON.stringify(req.body.plot_keywords);
         let imdb_link = req.body.imdb_link;
-        let num_user_for_reviews = req.body.num_user_for_reviews;
+        let num_user_for_reviews
+        req.body.num_user_for_reviews ? num_user_for_reviews = req.body.num_user_for_reviews : num_user_for_reviews =  0
         let language = req.body.language;
         let country = req.body.country;
         let content_rating = req.body.content_rating;
-        let budget = req.body.budget;
+        let budget
+        req.body.budget ? budget = req.body.budget : budget =  0
         let title_year = req.body.title_year;
-        let imdb_score = req.body.imdb_score;
-        let aspect_ratio = req.body.aspect_ratio;
-        let movie_facebook_likes = req.body.movie_facebook_likes;
+        let imdb_score
+        req.body.imdb_score ? imdb_score = req.body.imdb_score : imdb_score =  0
+        let aspect_ratio 
+        req.body.aspect_ratio ? aspect_ratio = req.body.aspect_ratio : aspect_ratio =  0
+        let movie_facebook_likes
+        req.body.movie_facebook_likes ? movie_facebook_likes = req.body.movie_facebook_likes : movie_facebook_likes =  0
         // let actors = JSON.stringify(req.body.actors);
         let color = req.body.color;
         let director_id = req.body.director_id;

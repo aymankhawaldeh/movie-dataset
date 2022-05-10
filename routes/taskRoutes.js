@@ -27,55 +27,144 @@ router.get('/movie/search', (req, res) => {
 
 
     console.log(title, genres, plot_keywords)
+    if (plot_keywords == null && genres == null && title == null) {
 
-    if (plot_keywords == null && genres == null) {
+        res.status(403).json({ msg: 'Sorry their is no data available for your search' })
+
+
+
+    } else if (plot_keywords == null && genres == null) {
         connection.query(`SELECT * FROM movies WHERE  title = ? `, [title], (err, result, rows, fields) => {
-            if (err) throw err;
-            console.log("in", title)
+            if (err) {
+                console.log(err.message)
+                res.status(500).send('Server Error');
 
-            res.send(result)
+            }
+            //  console.log("in", title)
+
+            if (result.length == 0) {
+                res.status(404).json({ msg: 'Sorry no data similar found' })
+
+
+            } else {
+                res.status(200).send(result)
+
+
+            }
+
 
         })
 
     } else if (plot_keywords == null && title == null) {
         connection.query(`SELECT * FROM movies WHERE  JSON_CONTAINS(genres, ?) `, [genres], (err, result, rows, fields) => {
-            if (err) throw err;
-            res.send(result)
+            if (err) {
+                console.log(err.message)
+                res.status(500).send('Server Error');
+
+            }
+            if (result.length == 0) {
+                res.status(404).json({ msg: 'Sorry no data similar found' })
+
+
+            } else {
+                res.status(200).send(result)
+
+
+            }
 
         })
 
     } else if (genres == null && title == null) {
         connection.query(`SELECT * FROM movies WHERE  JSON_CONTAINS(plot_keywords, ?) `, [plot_keywords], (err, result, rows, fields) => {
-            if (err) throw err;
-            res.send(result)
+            if (err) {
+                console.log(err.message)
+                res.status(500).send('Server Error');
+
+            }
+            if (result.length == 0) {
+                res.status(404).json({ msg: 'Sorry no data similar found' })
+
+
+            } else {
+                res.status(200).send(result)
+
+
+            }
 
         })
     } else
         if (title == null) {
             connection.query(`SELECT * FROM movies WHERE  JSON_CONTAINS(genres, ?) AND  JSON_CONTAINS(plot_keywords, ?)`, [genres, plot_keywords], (err, result, rows, fields) => {
-                if (err) throw err;
-                res.send(result)
+                if (err) {
+                    console.log(err.message)
+                    res.status(500).send('Server Error');
+
+                }
+                if (result.length == 0) {
+                    res.status(404).json({ msg: 'Sorry no data similar found' })
+
+
+                } else {
+                    res.status(200).send(result)
+
+
+                }
 
             })
         } else if (genres == null) {
             connection.query(`SELECT * FROM movies WHERE  title = ? AND JSON_CONTAINS(plot_keywords, ?)`, [title, plot_keywords], (err, result, rows, fields) => {
-                if (err) throw err;
-                res.send(result)
+                if (err) {
+                    console.log(err.message)
+                    res.status(500).send('Server Error');
+
+                }
+                if (result.length == 0) {
+                    res.status(404).json({ msg: 'Sorry no data similar found' })
+
+
+                } else {
+                    res.status(200).send(result)
+
+
+                }
 
             })
 
         } else if (plot_keywords == null) {
             connection.query(`SELECT * FROM movies WHERE  title = ? AND JSON_CONTAINS(genres, ?)`, [title, genres], (err, result, rows, fields) => {
-                if (err) throw err;
-                res.send(result)
+                if (err) {
+                    console.log(err.message)
+                    res.status(500).send('Server Error');
+
+                }
+                if (result.length == 0) {
+                    res.status(404).json({ msg: 'Sorry no data similar found' })
+
+
+                } else {
+                    res.status(200).send(result)
+
+
+                }
 
             })
         } else {
 
             connection.query(`SELECT * FROM movies WHERE title = ? AND JSON_CONTAINS(genres, ?) AND  JSON_CONTAINS(plot_keywords, ?)`, [title, genres, plot_keywords], (err, result, rows, fields) => {
-                if (err) throw err;
-                res.send(result)
+                if (err) {
+                    console.log(err.message)
+                    res.status(500).send('Server Error');
 
+                }
+                if (result.length == 0) {
+                    res.status(404).json({ msg: 'Sorry no data similar found' })
+
+
+                } else {
+                    res.status(200).send(result)
+
+
+                }
             })
         }
 
@@ -94,10 +183,13 @@ router.get('/movie/count', (req, res) => {
 
     connection.query(`  SELECT  count(title) as 'number of movies',  language, country, if(max(imdb_score) - min(imdb_score) = 0, max(imdb_score), concat(min(imdb_score),'-',max(imdb_score))) as 'imdb_score'  from movies group by language, country
     HAVING language != 'null' AND country != 'null'`, (err, result, rows) => {
-        if (err) throw err;
+        if (err) {
+            console.log(err.message)
+            res.status(500).send('Server Error');
 
+        }
         // console.log(" all actors id ", actor)
-        console.log("result", result)
+        // console.log("result", result)
 
         // console.log("rows", rows)
         res.status(200).send(result)
@@ -161,8 +253,11 @@ router.get('/movie/all', (req, res) => {
 
 
         connection.query(`SELECT * FROM movies WHERE JSON_CONTAINS(genres, ?)  OR  JSON_CONTAINS(plot_keywords, ?)`, [newGenres, new_plot_keywords], (err, result, rows, fields) => {
-            if (err) throw err;
-
+            if (err) {
+                console.log(err.message)
+                res.status(500).send('Server Error');
+    
+            }
             // console.log(" all actors id ", actor)
             // console.log("result", result)
             // console.log("rows", rows)

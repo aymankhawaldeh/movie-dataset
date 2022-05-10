@@ -7,7 +7,9 @@ var connection = require('../database')
 // GET ROUTES
 
 
-router.get('/actors', (req, res) => {
+
+
+router.get("/actors", (req, res) => {
 
     connection.query("SELECT * from actors", (err, rows, fields, result) => {
         if (err) {
@@ -130,12 +132,15 @@ router.post('/addActor', [
 
 
 router.put('/editActor/:id', [
-    check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' '}), check('name', 'Name is required').not().isEmpty(), check('facebook_likes').isInt().withMessage('facebook_likes must be an Integer number'), check('facebook_likes').not().isString().withMessage('facebook_likes must be an Integer number'), check('id').not().isEmpty().withMessage('you must identify the id for the data'),  check('id').isInt({ gt: -1 }).withMessage('id must be an Integer number')], (req, res) => {
+    check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' '}), check('name', 'Name is required').not().isEmpty(), check('facebook_likes').optional().isInt().withMessage('facebook_likes must be an Integer number'), check('facebook_likes').optional().not().isString().withMessage('facebook_likes must be an Integer number'), check('id').not().isEmpty().withMessage('you must identify the id for the data'),  check('id').isInt({ gt: -1 }).withMessage('id must be an Integer number')], (req, res) => {
 
 
     let id = req.params.id
     let name = req.body.name;
-    let facebook_likes = req.body.facebook_likes;
+    
+    let facebook_likes;
+    req.body.facebook_likes ? facebook_likes = req.body.facebook_likes : facebook_likes =  0
+
     let obj = {
         Status: 'Actor Updated Successfully',
         Data: req.body

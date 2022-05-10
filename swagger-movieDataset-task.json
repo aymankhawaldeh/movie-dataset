@@ -1,0 +1,812 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "defaultTitle",
+    "description": "defaultDescription",
+    "version": "0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000"
+    }
+  ],
+  "paths": {
+    "/api/editMovie/60": {
+      "put": {
+        "description": "here in this route /api/editMovie/:id you can edit and movie by its ID, you have to declare 2 necessary data in req.body 1- title. 2-director_id.",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/editMovie_60_body"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\r\n    \"title\": \"amazing week\",\r\n    \"duration\": 1500,\r\n    \"gross\": 120000,\r\n    \"genres\": [\"Animation\",\"Thriller\",\"Funny\"],\r\n    \"num_voted_users\": 200,\r\n    \"cast_total_facebook_likes\": 300,\r\n    \"plot_keywords\": [\"movie\",\"amazing\",\"week\"],\r\n    \"imdb_link\": \"https://www.imdb.com/title/tt0091415\",\r\n    \"num_user_for_reviews\": 200,\r\n    \"language\": \"USA\",\r\n    \"country\": \"USA\",\r\n    \"content_rating\": \"PG-13\",\r\n    \"budget\":10000,\r\n    \"title_year\": \"1996\",\r\n    \"imdb_score\": 9.2,\r\n    \"aspect_ratio\": 1.21,\r\n    \"movie_facebook_likes\": 200,\r\n    \"color\": \"color\",\r\n    \"director_id\": 6\r\n\r\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/addMovie": {
+      "post": {
+        "description": "in this route http://localhost:8000/api/addMovie you can add movie by writing the below fields",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/api_addMovie_body"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\r\n    \"title\": \"Big Movie\",\r\n    \"duration\": 1500,\r\n    \"gross\": 120000,\r\n    \"genres\": [\"Action\",\"Thriller\",\"Animation\"],\r\n    \"num_voted_users\": 200,\r\n    \"cast_total_facebook_likes\": 300,\r\n    \"plot_keywords\": [\"movie\",\"big\",\"action\"],\r\n    \"imdb_link\": \"https://www.imdb.com/title/tt0091415\",\r\n    \"num_user_for_reviews\": 200,\r\n    \"language\": \"USA\",\r\n    \"country\": \"USA\",\r\n    \"content_rating\": \"PG-13\",\r\n    \"budget\":10000,\r\n    \"title_year\": \"1996\",\r\n    \"imdb_score\": 9.2,\r\n    \"aspect_ratio\": 1.21,\r\n    \"movie_facebook_likes\": 200,\r\n    \"color\": \"color\",\r\n    \"director_id\": 1\r\n\r\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/actor/1": {
+      "get": {
+        "description": "in this route /api/actor/:id you can get and actor by his ID",
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/deleteMovieActor": {
+      "delete": {
+        "description": "in this route /api/deleteMovieActor you can remove any relation between any movie and actor they have already relation",
+        "parameters": [
+          {
+            "name": "actor_id",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "87"
+          },
+          {
+            "name": "movie_id",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "30"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/addActorMovie": {
+      "post": {
+        "description": "in this route /api/addActorMovie you can declare a new relation is not exist between actor and movie",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/api_addActorMovie_body"
+              },
+              "examples": {
+                "0": {
+                  "value": " {\n        \"movie_id\": 1,\n        \"actor_id\": 61\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/movie/all": {
+      "get": {
+        "description": "in this route /api/movie/all you can get all the movies and you can filter the data depends on genres OR plot_keywords values",
+        "parameters": [
+          {
+            "name": "plot_keywords",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "action"
+          },
+          {
+            "name": "genres",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Action"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector"
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/deleteActor/9": {
+      "delete": {
+        "description": "in this route /api/deleteActor/:id you can delete any actor from our data by his ID",
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/getMovie/1": {
+      "get": {
+        "description": "in this route /api/getMovie/:id you can get any movie from our data by its ID",
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/getOneMoviesActors": {
+      "get": {
+        "description": "in this route /api/getOneMoviesActors you can get any relation that we have between a movie and an actor by query their ID'S",
+        "parameters": [
+          {
+            "name": "actor_id",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1"
+          },
+          {
+            "name": "movie_id",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/movie/search": {
+      "get": {
+        "description": "in this route /api/movie/search you can search on any movie by passing title AND plot_keywords AND genres the data must match to get data.",
+        "parameters": [
+          {
+            "name": "",
+            "in": "query",
+            "required": false,
+            "allowEmptyValue": true,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "plot_keywords",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "avatar"
+          },
+          {
+            "name": "genres",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Action"
+          },
+          {
+            "name": "title",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "Avatar"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/deleteMovie/40": {
+      "delete": {
+        "description": "in this route /api/deleteMovie/:id you can delete any movie by it's id",
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/movie/count": {
+      "get": {
+        "description": "in this route /api/movie/count you can get the number of movies depend on the language and country and score",
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector"
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/movies": {
+      "get": {
+        "description": "in this route /api/movies you can get all the movies",
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector"
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/actors": {
+      "get": {
+        "description": "in this route /api/actors you can get all the actors",
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector"
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/editActor/10": {
+      "put": {
+        "description": "in this route /api/editActor/:id you can edit any actor data by it's ID",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/editActor_10_body"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\n   \n    \"name\": \"Shadi\",\n    \"facebook_likes\": 10000\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/getMoviesActors": {
+      "get": {
+        "description": "in this route /api/getMoviesActors you can get all the relations between the movies and the actors",
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector"
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    },
+    "/api/addActor": {
+      "post": {
+        "description": "in this route /api/addActor you can add a new avtor",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/api_addActor_body"
+              },
+              "examples": {
+                "0": {
+                  "value": "{\n   \n    \"name\": \"Ayman Actor\",\n    \"facebook_likes\": 1000\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "schema": {
+                  "type": "string"
+                },
+                "examples": {}
+              }
+            }
+          }
+        },
+        "servers": [
+          {
+            "url": "http://localhost:8000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:8000"
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "editMovie_60_body": {
+        "type": "object",
+        "properties": {
+          "plot_keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "country": {
+            "type": "string"
+          },
+          "aspect_ratio": {
+            "type": "number"
+          },
+          "num_voted_users": {
+            "type": "integer"
+          },
+          "gross": {
+            "type": "integer"
+          },
+          "color": {
+            "type": "string"
+          },
+          "num_user_for_reviews": {
+            "type": "integer"
+          },
+          "language": {
+            "type": "string"
+          },
+          "title_year": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "imdb_score": {
+            "type": "number"
+          },
+          "duration": {
+            "type": "integer"
+          },
+          "movie_facebook_likes": {
+            "type": "integer"
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "content_rating": {
+            "type": "string"
+          },
+          "cast_total_facebook_likes": {
+            "type": "integer"
+          },
+          "imdb_link": {
+            "type": "string"
+          },
+          "budget": {
+            "type": "integer"
+          },
+          "director_id": {
+            "type": "integer"
+          }
+        }
+      },
+      "api_addMovie_body": {
+        "type": "object",
+        "properties": {
+          "plot_keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "country": {
+            "type": "string"
+          },
+          "aspect_ratio": {
+            "type": "number"
+          },
+          "num_voted_users": {
+            "type": "integer"
+          },
+          "gross": {
+            "type": "integer"
+          },
+          "color": {
+            "type": "string"
+          },
+          "num_user_for_reviews": {
+            "type": "integer"
+          },
+          "language": {
+            "type": "string"
+          },
+          "title_year": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "imdb_score": {
+            "type": "number"
+          },
+          "duration": {
+            "type": "integer"
+          },
+          "movie_facebook_likes": {
+            "type": "integer"
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "content_rating": {
+            "type": "string"
+          },
+          "cast_total_facebook_likes": {
+            "type": "integer"
+          },
+          "imdb_link": {
+            "type": "string"
+          },
+          "budget": {
+            "type": "integer"
+          },
+          "director_id": {
+            "type": "integer"
+          }
+        }
+      },
+      "api_addActorMovie_body": {
+        "type": "object",
+        "properties": {
+          "actor_id": {
+            "type": "integer"
+          },
+          "movie_id": {
+            "type": "integer"
+          }
+        }
+      },
+      "editActor_10_body": {
+        "type": "object",
+        "properties": {
+          "facebook_likes": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "api_addActor_body": {
+        "type": "object",
+        "properties": {
+          "facebook_likes": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

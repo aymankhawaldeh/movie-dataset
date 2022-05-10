@@ -4,23 +4,32 @@ const bodyParser = require('body-parser');
 // const csv = require('csv-parser');
 const csv = require('fast-csv');
 var connection = require('./database')
+
 const app = express();
+
 const directorRoutes = require('./routes/directorRoutes');
 const actorRoutes = require('./routes/actorRoutes');
 const movieRoutes = require('./routes/movieRoutes');
 const movieActorRoutes = require('./routes/movieActorRoutes');
 const taskRoutes = require('./routes/taskRoutes');
 
+
 // app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(bodyParser.json())
 app.use(cors());
+
+
+
+
 
 app.use('/api', directorRoutes);
 app.use('/api', actorRoutes);
 app.use('/api', movieRoutes);
 app.use('/api', movieActorRoutes);
 app.use('/api', taskRoutes);
+
+
 
 var counter = 0;
 
@@ -33,7 +42,7 @@ app.get('/passing', (req, res) => {
     let csvStream = csv.parseFile(".\\csv\\movie_metadata.csv", { headers: true })
         .on("data", function (record) {
             csvStream.pause();
-             if (counter < 75) {
+            //  if (counter < 75) {
 
                 let title = record.movie_title.trim().replace(/\s/g, "") == "" ? null : record.movie_title.trim()
                 let duration = record.duration.replace(/\s/g, "") == "" ? 0 : record.duration
@@ -165,8 +174,8 @@ app.get('/passing', (req, res) => {
 
 
 
-                ++counter;
-            }
+            //     ++counter;
+            // }
         }).on("end", function () {
             console.log("Job is done!");
         }).on("error", function (err) {

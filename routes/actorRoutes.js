@@ -29,7 +29,7 @@ router.get("/actors", (req, res) => {
 
 
 
-router.get('/actor/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be an Integer number')], (req, res) => {
+router.get('/actor/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')], (req, res) => {
     let id = req.params.id;
  
     const errors = validationResult(req);
@@ -76,7 +76,10 @@ router.get('/actor/:id', [check('id').not().isEmpty().withMessage('you must iden
 
 
 router.post('/addActor', [
-    check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' '}),  check('name', 'Name is required').not().isEmpty(), check('facebook_likes').isInt().withMessage('facebook_likes must be an Integer number'), check('facebook_likes').not().isString().withMessage('facebook_likes must be an Integer number') ],(req, res) => {
+    check('name', 'Name is required').not().isEmpty(), check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' ', ignore: '.'}), 
+    check('facebook_likes').optional().isInt({ gt: -1 }).withMessage('facebook_likes must be an Integer number and not less than 0'),  check('facebook_likes').not().isString().withMessage('facebook_likes must be an Integer number')
+
+],(req, res) => {
   
         let name = req.body.name;
         let facebook_likes = req.body.facebook_likes;
@@ -87,7 +90,7 @@ router.post('/addActor', [
 
    const errors = validationResult(req);
    if (!errors.isEmpty()) {
-     return res.status(400).json({ errors: errors.array() });
+     return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
    }
 
     connection.query("SELECT * from  actors where name = ? ", [name], (err, result, rows, fields) => {
@@ -132,7 +135,12 @@ router.post('/addActor', [
 
 
 router.put('/editActor/:id', [
-    check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' '}), check('name', 'Name is required').not().isEmpty(), check('facebook_likes').optional().isInt().withMessage('facebook_likes must be an Integer number'), check('facebook_likes').optional().not().isString().withMessage('facebook_likes must be an Integer number'), check('id').not().isEmpty().withMessage('you must identify the id for the data'),  check('id').isInt({ gt: -1 }).withMessage('id must be an Integer number')], (req, res) => {
+
+    check('name', 'Name is required').not().isEmpty(), check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' ', ignore: '.'}), 
+    check('facebook_likes').optional().isInt({ gt: -1 }).withMessage('facebook_likes must be an Integer number and not less than 0'),  check('facebook_likes').not().isString().withMessage('facebook_likes must be an Integer number'),
+    check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')
+    
+    ], (req, res) => {
 
 
     let id = req.params.id
@@ -150,7 +158,7 @@ router.put('/editActor/:id', [
     
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
     }
 
 
@@ -218,7 +226,7 @@ router.put('/editActor/:id', [
 // DELETE ROUTES
 
 
-router.delete('/deleteActor/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'),  check('id').isInt({ gt: -1 }).withMessage('id must be an Integer number')], (req, res) => {
+router.delete('/deleteActor/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'),  check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')], (req, res) => {
     let id = req.params.id;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

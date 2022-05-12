@@ -34,8 +34,8 @@ router.get('/getMoviesActors', (req, res) => {
 
 router.get('/getOneMoviesActors',
     [
-        check('movie_id').not().isEmpty().withMessage('you must identify movie_id'), check('movie_id').isInt({ gt: -1 }).withMessage('movie_id must be an Integer number'),
-        check('actor_id').not().isEmpty().withMessage('you must identify actor_id'), check('actor_id').isInt({ gt: -1 }).withMessage('actor_id must be an Integer number'),
+        check('movie_id').not().isEmpty().withMessage('you must identify movie_id'), check('movie_id').optional().isInt({ gt: -1 }).withMessage('movie_id must be a real Integer number'),
+        check('actor_id').not().isEmpty().withMessage('you must identify actor_id'), check('actor_id').optional().isInt({ gt: -1 }).withMessage('actor_id must be a real Integer number'),
 
     ], (req, res) => {
 
@@ -72,8 +72,15 @@ router.get('/getOneMoviesActors',
 
 
 router.post('/addActorMovie', [
-    check('movie_id').not().isEmpty().withMessage('you must identify movie_id'), check('movie_id').isInt({ gt: -1 }).withMessage('movie_id must be an Integer number'),
-    check('actor_id').not().isEmpty().withMessage('you must identify actor_id'), check('actor_id').isInt({ gt: -1 }).withMessage('actor_id must be an Integer number')
+    check('movie_id').not().isEmpty().withMessage('you must identify movie_id'),
+     check('movie_id').optional().isInt({ gt: -1 }).withMessage('movie_id must be a real Integer number'),
+     check('movie_id').optional().not().isString().withMessage('movie_id must be a real Integer number'),
+
+
+    check('actor_id').not().isEmpty().withMessage('you must identify actor_id'),
+     check('actor_id').optional().isInt({ gt: -1 }).withMessage('actor_id must be a real Integer number'),
+     check('actor_id').optional().not().isString().withMessage('movie_id must be a real Integer number'),
+
 
 ], (req, res) => {
 
@@ -88,7 +95,7 @@ router.post('/addActorMovie', [
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
+        return res.status(400).json({ errors: errors.array() });
     }
 
 

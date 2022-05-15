@@ -21,7 +21,7 @@ router.get('/movies', (req, res) => {
 
         }
         if (rows.length == 0) {
-            return res.status(404).json({ msg: 'No Movies found' })
+            return res.status(204).json({ msg: 'No Movies found' })
 
         } else {
             res.status(200).send(rows)
@@ -54,7 +54,7 @@ router.get('/getMovie/:id', [
 
         }
         if (rows.length == 0) {
-            return res.status(404).json({ msg: 'Movie not found' })
+            return res.status(204).json({ msg: 'Movie not found' })
 
         } else {
             res.status(200).send(rows[0])
@@ -392,7 +392,7 @@ router.put('/editMovie/:id',
 
 
                 if (result.length == 0) {
-                    res.status(404).json({ msg: 'Movie is not exist' })
+                    res.status(204).json({ msg: 'Movie is not exist' })
 
                 } else if (req.body.director_id) {
 
@@ -405,7 +405,7 @@ router.put('/editMovie/:id',
                         }
 
                         if (result.length == 0) {
-                            return res.status(404).json({ msg: 'please add a valid related id for directors' })
+                            return res.status(204).json({ msg: 'please add a valid related id for directors' })
                         } else {
 
 
@@ -581,7 +581,7 @@ router.put('/editMoviewithot/:id',
                 }
 
                 if (result.length == 0) {
-                    res.status(404).json({ msg: 'Movie is not exist' })
+                    res.status(204).json({ msg: 'Movie is not exist' })
 
                 } else {
 
@@ -765,7 +765,7 @@ router.delete('/deleteMovie/:id', [check('id').not().isEmpty().withMessage('you 
 
     connection.query("Select * FROM movies WHERE id = ?", [id], (err, result) => {
         if (result.length == 0) {
-            return res.status(404).json({ msg: 'Movie not found' })
+            return res.status(204).json({ msg: 'Movie not found' })
 
         } else {
 

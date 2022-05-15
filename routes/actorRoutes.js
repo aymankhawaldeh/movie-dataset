@@ -18,7 +18,7 @@ router.get("/actors", (req, res) => {
 
         }
         if(rows.length == 0){
-            return res.status(404).json({msg: 'No Actors found'})
+            return res.status(204).json({msg: 'No Actors found'})
 
         } else {
         res.status(200).send(rows)
@@ -46,7 +46,7 @@ router.get('/actor/:id', [check('id').not().isEmpty().withMessage('you must iden
 
         }
         if(rows.length == 0){
-            return res.status(404).json({msg: 'Actor not found'})
+            return res.status(204).json({msg: 'Actor not found'})
 
         } else {
         res.status(200).send(rows[0])
@@ -172,7 +172,7 @@ router.put('/editActor/:id', [
         }
 
             if (result.length == 0) {
-                return res.status(404).json({ msg: 'Actor not exists' })
+                return res.status(204).json({ msg: 'Actor not exists' })
 
 
 
@@ -235,7 +235,7 @@ router.delete('/deleteActor/:id', [check('id').not().isEmpty().withMessage('you 
 
      connection.query("Select * FROM actors WHERE id = ?", [id], (err, result) => {
         if (result.length == 0) {
-            return res.status(404).json({ msg: 'Actor not found' })
+            return res.status(204).json({ msg: 'Actor not found' })
 
         } else {
 

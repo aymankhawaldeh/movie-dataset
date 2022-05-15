@@ -19,7 +19,7 @@ router.get('/getMoviesActors', (req, res) => {
 
         }
         if (rows.length == 0) {
-            return res.status(404).json({ msg: 'No relations found' })
+            return res.status(204).json({ msg: 'No relations found' })
 
         } else {
             res.status(200).send(result)
@@ -57,7 +57,7 @@ router.get('/getOneMoviesActors',
 
             }
             if (result.length == 0) {
-                return res.status(404).json({ msg: 'No relation found' })
+                return res.status(204).json({ msg: 'No relation found' })
 
             } else {
                 res.status(200).send(result[0])
@@ -106,7 +106,7 @@ router.post('/addActorMovie', [
 
         }
         if(result.length == 0){
-            return res.status(404).json({ msg: 'This movie_id is not exist in movies table' })
+            return res.status(204).json({ msg: 'This movie_id is not exist in movies table' })
 
 
         } else {
@@ -130,7 +130,7 @@ router.post('/addActorMovie', [
         
                     }
                     if(result.length == 0){
-                        return res.status(404).json({ msg: 'This actor_id is not exist in actors table' })
+                        return res.status(204).json({ msg: 'This actor_id is not exist in actors table' })
 
 
                     } else {
@@ -185,7 +185,7 @@ router.delete('/deleteMovieActor', [
         }
 
         if (result.length == 0) {
-            return res.status(404).json({ msg: 'This relation is not exist' })
+            return res.status(204).json({ msg: 'This relation is not exist' })
         } else {
 
             connection.query("DELETE FROM movies_actors WHERE movie_id = ? AND actor_id = ?", [movie_id, actor_id], (err, result) => {

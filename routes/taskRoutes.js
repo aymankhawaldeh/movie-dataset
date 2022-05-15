@@ -29,7 +29,7 @@ router.get('/movie/search', (req, res) => {
     console.log(title, genres, plot_keywords)
     if (plot_keywords == null && genres == null && title == null) {
 
-        res.status(403).json({ msg: 'Sorry their is no data available for your search' })
+        res.status(204).json({ msg: 'Sorry their is no data available for your search' })
 
 
 
@@ -43,7 +43,7 @@ router.get('/movie/search', (req, res) => {
             //  console.log("in", title)
 
             if (result.length == 0) {
-                res.status(404).json({ msg: 'Sorry no data similar found' })
+                res.status(204).json({ msg: 'Sorry no data similar found' })
 
 
             } else {
@@ -63,7 +63,7 @@ router.get('/movie/search', (req, res) => {
 
             }
             if (result.length == 0) {
-                res.status(404).json({ msg: 'Sorry no data similar found' })
+                res.status(204).json({ msg: 'Sorry no data similar found' })
 
 
             } else {
@@ -82,7 +82,7 @@ router.get('/movie/search', (req, res) => {
 
             }
             if (result.length == 0) {
-                res.status(404).json({ msg: 'Sorry no data similar found' })
+                res.status(204).json({ msg: 'Sorry no data similar found' })
 
 
             } else {
@@ -101,7 +101,7 @@ router.get('/movie/search', (req, res) => {
 
                 }
                 if (result.length == 0) {
-                    res.status(404).json({ msg: 'Sorry no data similar found' })
+                    res.status(204).json({ msg: 'Sorry no data similar found' })
 
 
                 } else {
@@ -119,7 +119,7 @@ router.get('/movie/search', (req, res) => {
 
                 }
                 if (result.length == 0) {
-                    res.status(404).json({ msg: 'Sorry no data similar found' })
+                    res.status(204).json({ msg: 'Sorry no data similar found' })
 
 
                 } else {
@@ -138,7 +138,7 @@ router.get('/movie/search', (req, res) => {
 
                 }
                 if (result.length == 0) {
-                    res.status(404).json({ msg: 'Sorry no data similar found' })
+                    res.status(204).json({ msg: 'Sorry no data similar found' })
 
 
                 } else {
@@ -157,7 +157,7 @@ router.get('/movie/search', (req, res) => {
 
                 }
                 if (result.length == 0) {
-                    res.status(404).json({ msg: 'Sorry no data similar found' })
+                    res.status(204).json({ msg: 'Sorry no data similar found' })
 
 
                 } else {
@@ -239,11 +239,14 @@ router.get('/movie/all', (req, res) => {
     if (!newGenres && !new_plot_keywords) {
 
         connection.query("SELECT * FROM movies", (err, result, rows, fields) => {
-            if (err) throw err;
+            if (err) {
+                console.log(err.message)
+                res.status(500).send('Server Error');
+    
+            }
 
 
-
-            res.send(result)
+            res.status(200).send(result)
 
 
         })
@@ -258,6 +261,16 @@ router.get('/movie/all', (req, res) => {
                 res.status(500).send('Server Error');
     
             }
+
+            if (result.length == 0) {
+                res.status(204).json({ msg: 'Sorry no data similar found' })
+
+
+            } else {
+                res.status(200).send(result)
+
+
+            }
             // console.log(" all actors id ", actor)
             // console.log("result", result)
             // console.log("rows", rows)
@@ -265,7 +278,7 @@ router.get('/movie/all', (req, res) => {
             //   console.log("genres", genres)
             //   console.log("result", result[0])
 
-            res.send(result)
+      
 
 
         })

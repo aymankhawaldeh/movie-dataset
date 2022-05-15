@@ -21,7 +21,7 @@ router.get('/directors', (req, res) => {
 
         }
         if (rows.length == 0) {
-            return res.status(404).json({ msg: 'No Directors found' })
+            return res.status(204).json({ msg: 'No Directors found' })
 
         } else {
             res.status(200).send(rows)
@@ -45,7 +45,7 @@ router.get('/director/:id', [check('id').not().isEmpty().withMessage('you must i
 
         }
         if (rows.length == 0) {
-            return res.status(404).json({ msg: 'Director not found' })
+            return res.status(204).json({ msg: 'Director not found' })
 
         } else {
             res.status(200).send(rows[0])
@@ -158,7 +158,7 @@ router.put('/editDirector/:id', [
             }
 
             if (result.length == 0) {
-                return res.status(404).json({ msg: 'Director not exists' })
+                return res.status(204).json({ msg: 'Director not exists' })
 
 
 
@@ -228,7 +228,7 @@ router.delete('/deleteDirector/:id', [check('id').not().isEmpty().withMessage('y
 
      connection.query("Select * FROM directors WHERE id = ?", [id], (err, result) => {
         if (result.length == 0) {
-            return res.status(404).json({ msg: 'Director not found' })
+            return res.status(204).json({ msg: 'Director not found' })
 
         } else {
 

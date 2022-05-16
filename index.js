@@ -43,7 +43,7 @@ app.get('/passing', (req, res) => {
     let csvStream = csv.parseFile(".\\csv\\movie_metadata.csv", { headers: true })
         .on("data", function (record) {
             csvStream.pause();
-            //  if (counter < 75) {
+             if (counter < 75) {
 
                 let title = record.movie_title.trim().replace(/\s/g, "") == "" ? null : record.movie_title.trim()
                 let duration = record.duration.replace(/\s/g, "") == "" ? 0 : record.duration
@@ -114,10 +114,10 @@ app.get('/passing', (req, res) => {
 
 
                 connection.query("INSERT INTO movies \
-        (title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, color, director_id) \
+        (title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, color, director_id, director_name) \
          VALUES \
-         (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM directors WHERE name = ? LIMIT 1))",
-                    [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, color, director], function (err, result) {
+         (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM directors WHERE name = ? LIMIT 1), ?)",
+                    [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, color, director, director], function (err, result) {
                         if (err) {
                             console.log(err);
 
@@ -175,8 +175,8 @@ app.get('/passing', (req, res) => {
 
 
 
-            //     ++counter;
-            // }
+                ++counter;
+            }
         }).on("end", function () {
             console.log("Job is done!");
         }).on("error", function (err) {
@@ -210,6 +210,7 @@ app.listen(8000, () => {
         let createDirectors = `CREATE TABLE IF NOT EXISTS directors (
             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
             name varchar(45) UNIQUE not null,
+            movies JSON,
             facebook_likes INT
             
             );`;
@@ -243,6 +244,7 @@ app.listen(8000, () => {
                 movie_facebook_likes INT,
                 color VARCHAR(15),
                 director_id INT not null,
+                director_name varchar(45) NOT NULL,
                 CONSTRAINT di_co
                 FOREIGN KEY(director_id) REFERENCES directors(id)
                 ON DELETE CASCADE ON UPDATE CASCADE

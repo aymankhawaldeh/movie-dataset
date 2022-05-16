@@ -12,22 +12,22 @@ var connection = require('../database')
 
 
 
-router.get('/directors', (req, res) => {
+// router.get('/directors', (req, res) => {
 
-    connection.query("SELECT * from directors", (err, rows, fields, result) => {
-        if (err) {
-            console.log(err.message)
-            res.status(500).send('Server Error');
+//     connection.query("SELECT * from directors", (err, rows, fields, result) => {
+//         if (err) {
+//             console.log(err.message)
+//             res.status(500).send('Server Error');
 
-        }
-        if (rows.length == 0) {
-            return res.status(204).json({ msg: 'No Directors found' })
+//         }
+//         if (rows.length == 0) {
+//             return res.status(204).json({ msg: 'No Directors found' })
 
-        } else {
-            res.status(200).send(rows)
-        }
-    })
-});
+//         } else {
+//             res.status(200).send(rows)
+//         }
+//     })
+// });
 
 
 
@@ -246,6 +246,119 @@ router.delete('/deleteDirector/:id', [check('id').not().isEmpty().withMessage('y
 
 
 
+
+
+
+
+
+
+
+router.get('/directors', (req, res) => {
+
+
+
+    let count;
+
+    connection.query("SELECT * from directors", (err,result,rows) =>{
+
+        if (err) throw err;
+
+        count = result.length
+
+
+    })
+
+    
+    // limit per page as || 20
+    const length = req.query.length
+    // page number
+    const page = req.query.page
+    // calculate offset
+    const offset = (page - 1) * length
+
+
+    
+    // query for fetching data with page number and offset
+    const prodsQuery = "select * from directors limit "+length+" OFFSET "+offset
+ 
+      connection.query(prodsQuery, function (error, results, fields) {
+        // When done with the connection, release it.
+             if (error) throw error;
+
+      
+
+
+        // create payload
+        var jsonResult = {
+          'count':count,
+          'page_number':page,
+          'products_page_count':results.length,
+          'products':results
+        }
+        // create response
+        var myJsonString = JSON.parse(JSON.stringify(jsonResult));
+        // res.statusMessage = "Products for page "+page;
+        res.statusCode = 200;
+        res.json(myJsonString);
+        // res.end();
+      })
+    })
+
+// router.get('/directors', (req, res) => {
+//     var page = parseInt(req.query.page, 10) || 0;
+//     var numPerPage = 20;
+//     var skip = (page-1) * numPerPage; 
+//     var limit = skip + ',' + numPerPage;
+
+//     connection.query("SELECT count(*) as numRows from directors",function (err, rows, fields) {
+//         if(err) {
+//             console.log("error: ", err);
+//             result(err, null);
+//         }else{
+//             var numRows = rows[0].numRows;
+//             var numPages = Math.ceil(numRows / numPerPage);
+//             connection.query('SELECT * FROM users LIMIT ' + limit,function (err, rows, fields) {
+//                 if(err) {
+//                     console.log("error: ", err);
+//                     result(err, null);
+//                 }else{
+//                     console.log(rows)
+//                     result(null, rows,numPages);
+//                 }
+//             });            
+//         }
+//     });
+// })
+
+
+
+
+
+
+
+
+
+// var numPerPage = 20;
+// var skip = (page-1) * numPerPage; 
+// var limit = skip + ',' + numPerPage; // Here we compute the LIMIT parameter for MySQL query
+// sql.query('SELECT count(*) as numRows FROM users',function (err, rows, fields) {
+//     if(err) {
+//         console.log("error: ", err);
+//         result(err, null);
+//     }else{
+//         var numRows = rows[0].numRows;
+//         var numPages = Math.ceil(numRows / numPerPage);
+//         sql.query('SELECT * FROM users LIMIT ' + limit,function (err, rows, fields) {
+//             if(err) {
+//                 console.log("error: ", err);
+//                 result(err, null);
+//             }else{
+//                 console.log(rows)
+//                 result(null, rows,numPages);
+//             }
+//         });            
+//     }
+// });
 
 module.exports = router;
 

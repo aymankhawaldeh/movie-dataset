@@ -1,7 +1,83 @@
 const express = require('express');
 const router = express.Router();
 const { check, validationResult } = require('express-validator')
+const Joi = require('joi');
 var connection = require('../database')
+
+
+
+
+
+function createActorSchema(req, res, next) {
+    // create schema object
+    const schema = Joi.object({
+        // name: Joi.string()
+        // .alphanum().min(3).max(30).required(),
+        name: Joi.string().regex(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/, 'Alpha, only real name in').min(3).max(30).required(),
+
+        
+        facebook_likes: Joi.number().integer().min(0).strict(),
+    });
+
+    // schema options
+    const options = {
+        abortEarly: false, // include all errors
+        allowUnknown: false, // ignore unknown props
+        stripUnknown: false // remove unknown props
+    };
+
+    // validate request body against schema
+    const { error, value } = schema.validate(req.body, options);
+
+    if (error) {
+        // on fail return comma separated errors
+        let message = error.details.map(x => x.message).join(', ')
+
+         
+        next(res.status(400).json({ error: message }));
+    } else {
+        // on success replace req.body with validated value and trigger next middleware function
+        req.body = value;
+        next();
+    }
+}
+
+
+
+function editActorSchema(req, res, next) {
+    // create schema object
+    const schema = Joi.object({
+        // name: Joi.string()
+        // .alphanum().min(3).max(30).required(),
+        name: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(30).required(),
+
+        
+        facebook_likes: Joi.number().integer().min(0).strict(),
+    });
+
+    // schema options
+    const options = {
+        abortEarly: false, // include all errors
+        allowUnknown: false, // ignore unknown props
+        stripUnknown: false // remove unknown props
+    };
+
+    // validate request body against schema
+    const { error, value } = schema.validate(req.body, options);
+
+    if (error) {
+        // on fail return comma separated errors
+        let message = error.details.map(x => x.message).join(', ')
+
+         
+        next(res.status(400).json({ error: message }));
+    } else {
+        // on success replace req.body with validated value and trigger next middleware function
+        req.body = value;
+        next();
+    }
+}
+
 
 
 // GET ROUTES
@@ -74,12 +150,12 @@ router.get('/actor/:id', [check('id').not().isEmpty().withMessage('you must iden
 // POST ROUTES
 
 
+router.post('/addActor', 
 
-router.post('/addActor', [
-    check('name', 'Name is required').not().isEmpty(), check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' ', ignore: '.'}), 
-    check('facebook_likes').optional().isInt({ gt: -1 }).withMessage('facebook_likes must be an Integer number and not less than 0'),  check('facebook_likes').not().isString().withMessage('facebook_likes must be an Integer number')
 
-],(req, res) => {
+createActorSchema
+
+,(req, res, next) => {
   
         let name = req.body.name;
         let facebook_likes = req.body.facebook_likes;
@@ -110,11 +186,14 @@ router.post('/addActor', [
 
             console.log(obj)
             res.status(201).json(obj)
+            next()
 
         })
 
     } else {
         return res.status(400).json({ msg: 'Actor already exists' })
+        next()
+
 
     }
 
@@ -136,11 +215,10 @@ router.post('/addActor', [
 
 router.put('/editActor/:id', [
 
-    check('name', 'Name is required').not().isEmpty(), check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' ', ignore: '.'}), 
-    check('facebook_likes').optional().isInt({ gt: -1 }).withMessage('facebook_likes must be an Integer number and not less than 0'),  check('facebook_likes').not().isString().withMessage('facebook_likes must be an Integer number'),
-    check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')
+    editActorSchema,
+        check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')
     
-    ], (req, res) => {
+    ], (req, res, next) => {
 
 
     let id = req.params.id
@@ -172,7 +250,9 @@ router.put('/editActor/:id', [
         }
 
             if (result.length == 0) {
-                return res.status(204).json({ msg: 'Actor not exists' })
+                return res.status(404).json({ msg: 'Actor not exists' })
+                next()
+
 
 
 
@@ -193,6 +273,8 @@ router.put('/editActor/:id', [
                             }
                             console.log(obj)
                             res.status(200).json(obj)
+                            next()
+
                         })
 
 

@@ -1,8 +1,82 @@
 const express = require('express');
 const router = express.Router();
-const { check, validationResult } = require('express-validator')
+const { checkSchema, check, validationResult } = require('express-validator')
+const Joi = require('joi');
 
 var connection = require('../database')
+
+
+function createDirectorSchema(req, res, next) {
+    // create schema object
+    const schema = Joi.object({
+        // name: Joi.string()
+        // .alphanum().min(3).max(30).required(),
+        name: Joi.string().regex(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/, 'Alpha, only real name in').min(3).max(30).required(),
+
+        
+        facebook_likes: Joi.number().integer().min(0).strict(),
+    });
+
+    // schema options
+    const options = {
+        abortEarly: false, // include all errors
+        allowUnknown: false, // ignore unknown props
+        stripUnknown: false // remove unknown props
+    };
+
+    // validate request body against schema
+    const { error, value } = schema.validate(req.body, options);
+
+    if (error) {
+        // on fail return comma separated errors
+        let message = error.details.map(x => x.message).join(', ')
+
+         
+        next(res.status(400).json({ error: message }));
+    } else {
+        // on success replace req.body with validated value and trigger next middleware function
+        req.body = value;
+        next();
+    }
+}
+
+
+
+
+function editDirectorSchema(req, res, next) {
+    // create schema object
+    const schema = Joi.object({
+        // name: Joi.string()
+        // .alphanum().min(3).max(30).required(),
+        name: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(30).required(),
+
+        
+        facebook_likes: Joi.number().integer().min(0).strict(),
+    });
+
+    // schema options
+    const options = {
+        abortEarly: false, // include all errors
+        allowUnknown: false, // ignore unknown props
+        stripUnknown: false // remove unknown props
+    };
+
+    // validate request body against schema
+    const { error, value } = schema.validate(req.body, options);
+
+    if (error) {
+        // on fail return comma separated errors
+        let message = error.details.map(x => x.message).join(', ')
+
+         
+        next(res.status(400).json({ error: message }));
+    } else {
+        // on success replace req.body with validated value and trigger next middleware function
+        req.body = value;
+        next();
+    }
+}
+
 
 
 
@@ -12,7 +86,51 @@ var connection = require('../database')
 
 
 
+// router.get('/directors', (req, res) => {
+
+//     connection.query("SELECT * from directors", (err, rows, fields, result) => {
+//         if (err) {
+//             console.log(err.message)
+//             res.status(500).send('Server Error');
+
+//         }
+//         if (rows.length == 0) {
+//             return res.status(204).json({ msg: 'No Directors found' })
+
+//         } else {
+//             res.status(200).send(rows)
+//         }
+//     })
+// });
+
+
+// PAGINATION
+
+
+
 router.get('/directors', (req, res) => {
+
+
+
+    let count;
+
+    connection.query("SELECT * from directors", (err,result,rows) =>{
+
+        if (err) throw err;
+
+        count = result.length
+    })
+
+ 
+    // limit per page as || 20
+    const length = req.query.length
+    // page number
+    const page = req.query.page
+
+    if(!length || !page){
+
+        
+
 
     connection.query("SELECT * from directors", (err, rows, fields, result) => {
         if (err) {
@@ -27,7 +145,44 @@ router.get('/directors', (req, res) => {
             res.status(200).send(rows)
         }
     })
-});
+
+
+    } else {
+
+
+
+
+
+    // calculate offset
+    const offset = (page - 1) * length
+
+
+    
+    // query for fetching data with page number and offset
+    const prodsQuery = "select * from directors limit "+length+" OFFSET "+offset
+ 
+      connection.query(prodsQuery, function (error, results, fields) {
+        // When done with the connection, release it.
+             if (error) throw error;
+
+      
+
+
+        // create payload
+        var jsonResult = {
+          'count':count,
+          'page_number':page,
+          'length':results.length,
+          'data':results
+        }
+        // create response
+        var myJsonString = JSON.parse(JSON.stringify(jsonResult));
+        // res.statusMessage = "Products for page "+page;
+        res.statusCode = 200;
+        res.json(myJsonString);
+        // res.end();
+      })}
+    })
 
 
 
@@ -57,20 +212,20 @@ router.get('/director/:id', [check('id').not().isEmpty().withMessage('you must i
 // POST ROUTES
 
 
-router.post('/addDirector', [
-     check('name', 'Name is required').not().isEmpty(), check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' ', ignore: '.'}), 
-    check('facebook_likes').optional().isInt({ gt: -1 }).withMessage('facebook_likes must be an Integer number and not less than 0'),  check('facebook_likes').not().isString().withMessage('facebook_likes must be an Integer number')
 
-   ],  (req, res) => {
+router.post('/addDirector',
 
-
+createDirectorSchema
+    , (req, res, next) => {
 
 
 
 
-        let name = req.body.name; 
+
+
+        let name = req.body.name;
         let facebook_likes;
-        req.body.facebook_likes ? facebook_likes = req.body.facebook_likes : facebook_likes =  0
+        req.body.facebook_likes ? facebook_likes = req.body.facebook_likes : facebook_likes = 0
 
         let obj = {
             Status: 'Director Created Successfully',
@@ -81,7 +236,7 @@ router.post('/addDirector', [
             return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
         }
 
-         connection.query("SELECT * from  directors where name = ? ", [name], (err, result, rows, fields) => {
+        connection.query("SELECT * from  directors where name = ? ", [name], (err, result, rows, fields) => {
             if (err) {
                 console.log(err.message)
                 res.status(500).send('Server Error');
@@ -93,23 +248,27 @@ router.post('/addDirector', [
                     if (err) {
                         console.log(err.message)
                         res.status(500).send('Server Error');
-    
+
                     }
 
                     // let oneDirector = { "name": name, "facebook_likes": facebook_likes }
                     console.log(obj)
                     res.status(201).json(obj)
+                     next()
 
                 })
 
             } else {
                 return res.status(400).json({ msg: 'Director already exists' })
+                next()
+
 
             }
 
 
 
         })
+       
 
     })
 
@@ -124,79 +283,86 @@ router.post('/addDirector', [
 
 
 
-router.put('/editDirector/:id', [
 
-    check('name', 'Name is required').not().isEmpty(), check('name', 'Name must be Alpha AND not empty').isAlpha('en-US', {ignore: ' ', ignore: '.'}), 
-    check('facebook_likes').optional().isInt({ gt: -1 }).withMessage('facebook_likes must be an Integer number and not less than 0'),  check('facebook_likes').not().isString().withMessage('facebook_likes must be an Integer number'),
-    check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')
+router.put('/editDirector/:id',
+editDirectorSchema,
 
-], (req, res) => {
+[
+  check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')
 
+]
 
-        let id = req.params.id
-        let name = req.body.name;
-        let facebook_likes;
-       req.body.facebook_likes ? facebook_likes = req.body.facebook_likes : facebook_likes =  0
-
-        let obj = {
-            Status: 'Director Updated Successfully',
-            Data: req.body
-        };
+, (req, res, next) => {
 
 
+    let id = req.params.id
+    let name = req.body.name;
+    let facebook_likes;
+    req.body.facebook_likes ? facebook_likes = req.body.facebook_likes : facebook_likes = 0
 
-        const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
+    let obj = {
+        Status: 'Director Updated Successfully',
+        Data: req.body
+    };
+
+
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
+    }
+
+    connection.query("SELECT * from  directors where id = ? ", [id], (err, result, rows, fields) => {
+        if (err) {
+            console.log(err.message)
+            res.status(500).send('Server Error');
+
         }
 
-        connection.query("SELECT * from  directors where id = ? ", [id], (err, result, rows, fields) => {
-            if (err) {
-                console.log(err.message)
-                res.status(500).send('Server Error');
-
-            }
-
-            if (result.length == 0) {
-                return res.status(204).json({ msg: 'Director not exists' })
+        if (result.length == 0) {
+            return res.status(404).send({ msg: 'Director not exists' })
+            next()
 
 
 
-            } else {
+        } else {
 
-                connection.query("SELECT * from  directors where name = ? AND id != ?", [name, id], (err, result) => {
-                    if (err) {
-                        console.log(err.message)
-                        res.status(500).send('Server Error');
-    
-                    }
-                    if (result.length == 0) {
-                        connection.query("UPDATE  directors SET name = ? , facebook_likes = ? WHERE id = ? ", [name, facebook_likes, id], (err, result) => {
-                            if (err) {
-                                console.log(err.message)
-                                res.status(500).send('Server Error');
-            
-                            }
-                            console.log(obj)
-                            res.status(200).json(obj)
-                        })
+            connection.query("SELECT * from  directors where name = ? AND id != ?", [name, id], (err, result) => {
+                if (err) {
+                    console.log(err.message)
+                    res.status(500).send('Server Error');
 
+                }
+                if (result.length == 0) {
+                    connection.query("UPDATE  directors SET name = ? , facebook_likes = ? WHERE id = ? ", [name, facebook_likes, id], (err, result) => {
+                        if (err) {
+                            console.log(err.message)
+                            res.status(500).send('Server Error');
 
+                        }
+                        console.log(obj)
+                        res.status(200).json(obj)
+                        next()
 
-                    } else {
-                        return res.status(400).json({ msg: 'Director with that name already exists' })
-
-                    }
-                })
+                    })
 
 
 
-                // let oneDirector = { "name": name, "facebook_likes": facebook_likes }
+                } else {
+                    return res.status(400).json({ msg: 'Director with that name already exists' })
+
+
+                }
+            })
+
+
+
+            // let oneDirector = { "name": name, "facebook_likes": facebook_likes }
 
 
 
 
-            }
+        }
 
 
 
@@ -205,12 +371,12 @@ router.put('/editDirector/:id', [
 
 
 
-        })
+    })
 
 
 
 
-    });
+});
 
 
 
@@ -219,14 +385,14 @@ router.put('/editDirector/:id', [
 // DELETE ROUTES
 
 
-router.delete('/deleteDirector/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')],  (req, res) => {
+router.delete('/deleteDirector/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')], (req, res) => {
     let id = req.params.id;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
-     connection.query("Select * FROM directors WHERE id = ?", [id], (err, result) => {
+    connection.query("Select * FROM directors WHERE id = ?", [id], (err, result) => {
         if (result.length == 0) {
             return res.status(204).json({ msg: 'Director not found' })
 

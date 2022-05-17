@@ -43,7 +43,7 @@ app.get('/passing', (req, res) => {
     let csvStream = csv.parseFile(".\\csv\\movie_metadata.csv", { headers: true })
         .on("data", function (record) {
             csvStream.pause();
-            //  if (counter < 75) {
+             if (counter < 176) {
 
                 let title = record.movie_title.trim().replace(/\s/g, "") == "" ? null : record.movie_title.trim()
                 let duration = record.duration.replace(/\s/g, "") == "" ? 0 : record.duration
@@ -70,7 +70,8 @@ app.get('/passing', (req, res) => {
                 let facebook_likes1 = record.actor_1_facebook_likes.replace(/\s/g, "") == "" ? 0 : record.actor_1_facebook_likes
                 let facebook_likes2 = record.actor_2_facebook_likes.replace(/\s/g, "") == "" ? 0 : record.actor_2_facebook_likes
                 let facebook_likes3 = record.actor_3_facebook_likes.replace(/\s/g, "") == "" ? 0 : record.actor_3_facebook_likes
-                let facebook_likes = record.director_facebook_likes.replace(/\s/g, "") == "" ? 0 : record.director_facebook_likes;
+                let facebook_likes = record.director_facebook_likes.replace(/\s/g, "") == "" ? 0 : record.director_facebook_likes
+                let movies = JSON.stringify([])
 
 
 
@@ -114,10 +115,10 @@ app.get('/passing', (req, res) => {
 
 
                 connection.query("INSERT INTO movies \
-        (title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, color, director_id) \
+        (title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, color, director_id, director_name) \
          VALUES \
-         (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM directors WHERE name = ? LIMIT 1))",
-                    [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, color, director], function (err, result) {
+         (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, (SELECT id FROM directors WHERE name = ? LIMIT 1), ?)",
+                    [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, color, director, director], function (err, result) {
                         if (err) {
                             console.log(err);
 
@@ -125,6 +126,7 @@ app.get('/passing', (req, res) => {
 
                         // if(result?.insertId) movieId = result?.insertId
                     });
+                    
 
 
 
@@ -169,14 +171,54 @@ app.get('/passing', (req, res) => {
                 })
 
 
+
+                connection.query("SELECT * FROM movies WHERE director_name = ? ", [director], function (err, rows, result) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    let titlesArray = []
+                    // console.log('result', result)
+                    // console.log('rowssss', rows)
+
+                    if(rows.length !== 0){
+                    //   console.log('rowssss', rows)
+
+
+
+                        rows.forEach(element =>{
+                            titlesArray.push(element.title)
+
+                        })
+                        
+                        let TitleJSon = JSON.stringify(titlesArray)
+
+
+
+                        connection.query("UPDATE directors SET directors.movies  = ? WHERE name = ? ", [TitleJSon, director], function (err, rows, result) {
+                            if (err) {
+                                console.log(err);
+                            }
+
+                        })
+
+                    }
+
+
+
+                });
+
+
+
+
+
                 csvStream.resume();
 
 
 
 
 
-            //     ++counter;
-            // }
+                ++counter;
+            }
         }).on("end", function () {
             console.log("Job is done!");
         }).on("error", function (err) {
@@ -210,7 +252,8 @@ app.listen(8000, () => {
         let createDirectors = `CREATE TABLE IF NOT EXISTS directors (
             id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
             name varchar(45) UNIQUE not null,
-            facebook_likes INT
+            facebook_likes INT,
+            movies JSON
             
             );`;
 
@@ -243,6 +286,7 @@ app.listen(8000, () => {
                 movie_facebook_likes INT,
                 color VARCHAR(15),
                 director_id INT not null,
+                director_name varchar(45) NOT NULL,
                 CONSTRAINT di_co
                 FOREIGN KEY(director_id) REFERENCES directors(id)
                 ON DELETE CASCADE ON UPDATE CASCADE

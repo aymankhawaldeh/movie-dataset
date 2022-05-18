@@ -12,9 +12,7 @@ function createDirectorSchema(req, res, next) {
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
         name: Joi.string().regex(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/, 'Alpha, only real name in').min(3).max(30).required(),
-
-        
-        facebook_likes: Joi.number().integer().min(0).strict(),
+        facebook_likes: Joi.number().integer().min(0).strict()
     });
 
     // schema options
@@ -48,10 +46,8 @@ function editDirectorSchema(req, res, next) {
     const schema = Joi.object({
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
-        name: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(30).required(),
-
-        
-        facebook_likes: Joi.number().integer().min(0).strict(),
+        name: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(30).required(), 
+        facebook_likes: Joi.number().integer().min(0).strict()
     });
 
     // schema options
@@ -85,7 +81,6 @@ function getDirectorSchema(req, res, next) {
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
         length: Joi.number().integer().min(1),
-        
         page: Joi.number().integer().min(1)
     });
 

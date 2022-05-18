@@ -12,7 +12,6 @@ function createMovieActorSchema(req, res, next) {
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
         actor_id: Joi.number().integer().min(0).strict().required(),
-        
         movie_id: Joi.number().integer().min(0).strict().required()
     });
 

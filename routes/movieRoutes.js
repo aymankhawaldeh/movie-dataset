@@ -118,8 +118,7 @@ function getMovieSchema(req, res, next) {
     const schema = Joi.object({
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
-        length: Joi.number().integer().min(1),
-        
+        length: Joi.number().integer().min(1),     
         page: Joi.number().integer().min(1)
     });
 

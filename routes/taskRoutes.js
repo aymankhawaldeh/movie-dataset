@@ -29,7 +29,7 @@ router.get('/movie/search', (req, res) => {
     console.log(title, genres, plot_keywords)
     if (plot_keywords == null && genres == null && title == null) {
 
-        res.status(204).json({ msg: 'Sorry their is no data available for your search' })
+        res.status(404).json({ msg: 'Sorry their is no data available for your search' })
 
 
 
@@ -43,7 +43,7 @@ router.get('/movie/search', (req, res) => {
             //  console.log("in", title)
 
             if (result.length == 0) {
-                res.status(204).json({ msg: 'Sorry no data similar found' })
+                res.status(404).json({ msg: 'Sorry no data similar found' })
 
 
             } else {
@@ -63,7 +63,7 @@ router.get('/movie/search', (req, res) => {
 
             }
             if (result.length == 0) {
-                res.status(204).json({ msg: 'Sorry no data similar found' })
+                res.status(404).json({ msg: 'Sorry no data similar found' })
 
 
             } else {
@@ -82,7 +82,7 @@ router.get('/movie/search', (req, res) => {
 
             }
             if (result.length == 0) {
-                res.status(204).json({ msg: 'Sorry no data similar found' })
+                res.status(404).json({ msg: 'Sorry no data similar found' })
 
 
             } else {
@@ -101,7 +101,7 @@ router.get('/movie/search', (req, res) => {
 
                 }
                 if (result.length == 0) {
-                    res.status(204).json({ msg: 'Sorry no data similar found' })
+                    res.status(404).json({ msg: 'Sorry no data similar found' })
 
 
                 } else {
@@ -119,7 +119,7 @@ router.get('/movie/search', (req, res) => {
 
                 }
                 if (result.length == 0) {
-                    res.status(204).json({ msg: 'Sorry no data similar found' })
+                    res.status(404).json({ msg: 'Sorry no data similar found' })
 
 
                 } else {
@@ -138,7 +138,7 @@ router.get('/movie/search', (req, res) => {
 
                 }
                 if (result.length == 0) {
-                    res.status(204).json({ msg: 'Sorry no data similar found' })
+                    res.status(404).json({ msg: 'Sorry no data similar found' })
 
 
                 } else {
@@ -157,7 +157,7 @@ router.get('/movie/search', (req, res) => {
 
                 }
                 if (result.length == 0) {
-                    res.status(204).json({ msg: 'Sorry no data similar found' })
+                    res.status(404).json({ msg: 'Sorry no data similar found' })
 
 
                 } else {
@@ -263,7 +263,7 @@ router.get('/movie/all', (req, res) => {
             }
 
             if (result.length == 0) {
-                res.status(204).json({ msg: 'Sorry no data similar found' })
+                res.status(404).json({ msg: 'Sorry no data similar found' })
 
 
             } else {

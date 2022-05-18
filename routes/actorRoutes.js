@@ -80,12 +80,155 @@ function editActorSchema(req, res, next) {
 
 
 
+
+function getActorSchema(req, res, next) {
+    // create schema object
+    const schema = Joi.object({
+        // name: Joi.string()
+        // .alphanum().min(3).max(30).required(),
+        length: Joi.number().integer().min(1),
+        
+        page: Joi.number().integer().min(1)
+    });
+
+    // schema options
+    const options = {
+        abortEarly: false, // include all errors
+        allowUnknown: false, // ignore unknown props
+        stripUnknown: false // remove unknown props
+    };
+
+    // validate request body against schema
+    const { error, value } = schema.validate(req.query, options);
+
+    if (error) {
+        // on fail return comma separated errors
+        let message = error.details.map(x => x.message).join(', ')
+
+         
+        next(res.status(400).json({ error: message }));
+    } else {
+        // on success replace req.body with validated value and trigger next middleware function
+        req.body = value;
+        next();
+    }
+}
+
+
+
+function getOneActorSchema(req, res, next) {
+    // create schema object
+    const schema = Joi.object({
+        // name: Joi.string()
+        // .alphanum().min(3).max(30).required(),
+        id: Joi.number().integer().min(1)
+        });
+
+    // schema options
+    const options = {
+        abortEarly: false, // include all errors
+        allowUnknown: false, // ignore unknown props
+        stripUnknown: false // remove unknown props
+    };
+
+    // validate request body against schema
+    const { error, value } = schema.validate(req.params, options);
+
+    if (error) {
+        // on fail return comma separated errors
+        let message = error.details.map(x => x.message).join(', ')
+
+         
+        next(res.status(400).json({ error: message }));
+    } else {
+        // on success replace req.body with validated value and trigger next middleware function
+        req.body = value;
+        next();
+    }
+}
+
+
+
+function deleteOneActorSchema(req, res, next) {
+    // create schema object
+    const schema = Joi.object({
+        // name: Joi.string()
+        // .alphanum().min(3).max(30).required(),
+        id: Joi.number().integer().min(1)
+        });
+
+    // schema options
+    const options = {
+        abortEarly: false, // include all errors
+        allowUnknown: false, // ignore unknown props
+        stripUnknown: false // remove unknown props
+    };
+
+    // validate request body against schema
+    const { error, value } = schema.validate(req.params, options);
+
+    if (error) {
+        // on fail return comma separated errors
+        let message = error.details.map(x => x.message).join(', ')
+
+         
+        next(res.status(400).json({ error: message }));
+    } else {
+        // on success replace req.body with validated value and trigger next middleware function
+        req.body = value;
+        next();
+    }
+}
+
+
+
+
+
 // GET ROUTES
 
 
+// router.get("/actors", (req, res) => {
+
+//     connection.query("SELECT * from actors", (err, rows, fields, result) => {
+//         if (err) {
+//             console.log(err.message)
+//             res.status(500).send('Server Error');
+
+//         }
+//         if(rows.length == 0){
+//             return res.status(404).json({msg: 'No Actors found'})
+
+//         } else {
+//         res.status(200).send(rows)
+//         }  
+//     })
+// });
+
+// PAGINATION
+
+router.get('/actors',getActorSchema, (req, res, next) => {
 
 
-router.get("/actors", (req, res) => {
+
+    let count;
+
+    connection.query("SELECT * from actors", (err,result,rows) =>{
+
+        if (err) throw err;
+
+        count = result.length
+    })
+
+ 
+    // limit per page as || 20
+    const length = req.query.length
+    // page number
+    const page = req.query.page
+
+    if(!length || !page){
+
+        
+
 
     connection.query("SELECT * from actors", (err, rows, fields, result) => {
         if (err) {
@@ -93,19 +236,67 @@ router.get("/actors", (req, res) => {
             res.status(500).send('Server Error');
 
         }
-        if(rows.length == 0){
-            return res.status(204).json({msg: 'No Actors found'})
+        if (rows.length == 0) {
+            return res.status(404).json({ msg: 'No Actors found' })
+            next()
+
 
         } else {
-        res.status(200).send(rows)
-        }  
+            res.status(200).send(rows)
+            next()
+        }
     })
-});
+
+
+    } else {
 
 
 
 
-router.get('/actor/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')], (req, res) => {
+
+    // calculate offset
+    const offset = (page - 1) * length
+
+
+    
+    // query for fetching data with page number and offset
+    const prodsQuery = "select * from actors limit "+length+" OFFSET "+offset
+ 
+      connection.query(prodsQuery, function (error, results, fields) {
+        // When done with the connection, release it.
+             if (error) throw error;
+
+      
+         if(results.length == 0){
+             res.status(404).json({"msg": `sorry there is no data in this page number (${page})`})
+             next()
+
+         } else {
+
+        // create payload
+        var jsonResult = {
+          'count':count,
+          'page_number':page,
+          'length':results.length,
+          'data':results
+        }
+        // create response
+        var myJsonString = JSON.parse(JSON.stringify(jsonResult));
+        // res.statusMessage = "Products for page "+page;
+        res.statusCode = 200;
+        res.json(myJsonString);
+        // res.end();
+    }
+      })}
+    })
+
+
+
+
+
+
+
+router.get('/actor/:id', getOneActorSchema,[check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')], (req, res, next) => {
     let id = req.params.id;
  
     const errors = validationResult(req);
@@ -122,10 +313,12 @@ router.get('/actor/:id', [check('id').not().isEmpty().withMessage('you must iden
 
         }
         if(rows.length == 0){
-            return res.status(204).json({msg: 'Actor not found'})
+            return res.status(404).json({msg: 'Actor not found'})
+            next()
 
         } else {
         res.status(200).send(rows[0])
+        next()
         }
     })
 })
@@ -308,7 +501,7 @@ router.put('/editActor/:id', [
 // DELETE ROUTES
 
 
-router.delete('/deleteActor/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'),  check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')], (req, res) => {
+router.delete('/deleteActor/:id',deleteOneActorSchema, [check('id').not().isEmpty().withMessage('you must identify the id for the data'),  check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')], (req, res, next) => {
     let id = req.params.id;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -317,7 +510,8 @@ router.delete('/deleteActor/:id', [check('id').not().isEmpty().withMessage('you 
 
      connection.query("Select * FROM actors WHERE id = ?", [id], (err, result) => {
         if (result.length == 0) {
-            return res.status(204).json({ msg: 'Actor not found' })
+            return res.status(404).json({ msg: 'Actor not found' })
+            next()
 
         } else {
 
@@ -328,6 +522,7 @@ router.delete('/deleteActor/:id', [check('id').not().isEmpty().withMessage('you 
 
                 }
                 res.status(200).json({ msg: 'Actor removed' });
+                next()
             })
         }
     })

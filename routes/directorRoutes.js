@@ -79,6 +79,106 @@ function editDirectorSchema(req, res, next) {
 
 
 
+function getDirectorSchema(req, res, next) {
+    // create schema object
+    const schema = Joi.object({
+        // name: Joi.string()
+        // .alphanum().min(3).max(30).required(),
+        length: Joi.number().integer().min(1),
+        
+        page: Joi.number().integer().min(1)
+    });
+
+    // schema options
+    const options = {
+        abortEarly: false, // include all errors
+        allowUnknown: false, // ignore unknown props
+        stripUnknown: false // remove unknown props
+    };
+
+    // validate request body against schema
+    const { error, value } = schema.validate(req.query, options);
+
+    if (error) {
+        // on fail return comma separated errors
+        let message = error.details.map(x => x.message).join(', ')
+
+         
+        next(res.status(400).json({ error: message }));
+    } else {
+        // on success replace req.body with validated value and trigger next middleware function
+        req.body = value;
+        next();
+    }
+}
+
+
+
+function getOneDirectorSchema(req, res, next) {
+    // create schema object
+    const schema = Joi.object({
+        // name: Joi.string()
+        // .alphanum().min(3).max(30).required(),
+        id: Joi.number().integer().min(1)
+        });
+
+    // schema options
+    const options = {
+        abortEarly: false, // include all errors
+        allowUnknown: false, // ignore unknown props
+        stripUnknown: false // remove unknown props
+    };
+
+    // validate request body against schema
+    const { error, value } = schema.validate(req.params, options);
+
+    if (error) {
+        // on fail return comma separated errors
+        let message = error.details.map(x => x.message).join(', ')
+
+         
+        next(res.status(400).json({ error: message }));
+    } else {
+        // on success replace req.body with validated value and trigger next middleware function
+        req.body = value;
+        next();
+    }
+}
+
+
+
+function deleteOneDirectorSchema(req, res, next) {
+    // create schema object
+    const schema = Joi.object({
+        // name: Joi.string()
+        // .alphanum().min(3).max(30).required(),
+        id: Joi.number().integer().min(1)
+        });
+
+    // schema options
+    const options = {
+        abortEarly: false, // include all errors
+        allowUnknown: false, // ignore unknown props
+        stripUnknown: false // remove unknown props
+    };
+
+    // validate request body against schema
+    const { error, value } = schema.validate(req.params, options);
+
+    if (error) {
+        // on fail return comma separated errors
+        let message = error.details.map(x => x.message).join(', ')
+
+         
+        next(res.status(400).json({ error: message }));
+    } else {
+        // on success replace req.body with validated value and trigger next middleware function
+        req.body = value;
+        next();
+    }
+}
+
+
 
 
 
@@ -108,7 +208,7 @@ function editDirectorSchema(req, res, next) {
 
 
 
-router.get('/directors', (req, res) => {
+router.get('/directors',getDirectorSchema, (req, res, next) => {
 
 
 
@@ -139,10 +239,13 @@ router.get('/directors', (req, res) => {
 
         }
         if (rows.length == 0) {
-            return res.status(204).json({ msg: 'No Directors found' })
+            return res.status(404).json({ msg: 'No Directors found' })
+            next()
+
 
         } else {
             res.status(200).send(rows)
+            next()
         }
     })
 
@@ -166,7 +269,11 @@ router.get('/directors', (req, res) => {
              if (error) throw error;
 
       
+         if(results.length == 0){
+             res.status(404).json({"msg": `sorry there is no data in this page number (${page})`})
+             next()
 
+         } else {
 
         // create payload
         var jsonResult = {
@@ -181,13 +288,14 @@ router.get('/directors', (req, res) => {
         res.statusCode = 200;
         res.json(myJsonString);
         // res.end();
+    }
       })}
     })
 
 
 
 
-router.get('/director/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')], (req, res) => {
+router.get('/director/:id',getOneDirectorSchema, [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')], (req, res, next) => {
     let id = req.params.id;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -200,10 +308,12 @@ router.get('/director/:id', [check('id').not().isEmpty().withMessage('you must i
 
         }
         if (rows.length == 0) {
-            return res.status(204).json({ msg: 'Director not found' })
+            return res.status(404).json({ msg: 'Director not found' })
+            next()
 
         } else {
             res.status(200).send(rows[0])
+            next()
         }
     })
 })
@@ -385,7 +495,7 @@ editDirectorSchema,
 // DELETE ROUTES
 
 
-router.delete('/deleteDirector/:id', [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')], (req, res) => {
+router.delete('/deleteDirector/:id', deleteOneDirectorSchema, [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')], (req, res, next) => {
     let id = req.params.id;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -394,7 +504,8 @@ router.delete('/deleteDirector/:id', [check('id').not().isEmpty().withMessage('y
 
     connection.query("Select * FROM directors WHERE id = ?", [id], (err, result) => {
         if (result.length == 0) {
-            return res.status(204).json({ msg: 'Director not found' })
+            return res.status(404).json({ msg: 'Director not found' })
+            next()
 
         } else {
 
@@ -405,6 +516,7 @@ router.delete('/deleteDirector/:id', [check('id').not().isEmpty().withMessage('y
 
                 }
                 res.status(200).json({ msg: 'Director removed' });
+                next()
             })
         }
     })

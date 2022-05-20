@@ -30,7 +30,7 @@ function createMovieActorSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
         req.body = value;
@@ -63,10 +63,10 @@ function deleteActorMovieSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
-        req.body = value;
+        req.query = value;
         next();
     }
 }
@@ -77,9 +77,8 @@ function getMovieActorSchema(req, res, next) {
     const schema = Joi.object({
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
-        length: Joi.number().integer().min(1),
-        
-        page: Joi.number().integer().min(1)
+        length: Joi.number().integer().min(1).required(),
+        page: Joi.number().integer().min(1).required()
     });
 
     // schema options
@@ -97,10 +96,10 @@ function getMovieActorSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
-        req.body = value;
+        req.query = value;
         next();
     }
 }
@@ -130,10 +129,10 @@ function getOneActorMovieSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
-        req.body = value;
+        req.query = value;
         next();
     }
 }
@@ -271,7 +270,9 @@ getOneActorMovieSchema,
         let actor_id = req.query.actor_id
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+        
+            let message = errors.array().map(x => x.msg).join(', ')
+            return res.status(400).json({ error: message});
         }
 
 
@@ -328,7 +329,9 @@ createMovieActorSchema,
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        
+        let message = errors.array().map(x => x.msg).join(', ')
+        return res.status(400).json({ error: message});
     }
 
 
@@ -414,7 +417,9 @@ deleteActorMovieSchema,
     let actor_id = req.query.actor_id;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
+        
+        let message = errors.array().map(x => x.msg).join(', ')
+        return res.status(400).json({ error: message});
     }
 
     connection.query("SELECT movie_id, actor_id from movies_actors WHERE movie_id = ? AND actor_id = ?", [movie_id, actor_id], (err, result, rows, fields) => {

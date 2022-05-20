@@ -11,7 +11,7 @@ function createDirectorSchema(req, res, next) {
     const schema = Joi.object({
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
-        name: Joi.string().regex(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/, 'Alpha, only real name in').min(3).max(30).required(),
+        name: Joi.string().regex(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/, 'Alpha, only real name in').min(3).max(25).required(),
         facebook_likes: Joi.number().integer().min(0).strict()
     });
 
@@ -30,7 +30,7 @@ function createDirectorSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
         req.body = value;
@@ -38,6 +38,39 @@ function createDirectorSchema(req, res, next) {
     }
 }
 
+
+
+
+function editDirectorSchemaId(req, res, next) {
+    // create schema object
+    const schema = Joi.object({
+        // name: Joi.string()
+        // .alphanum().min(3).max(30).required(),
+        id: Joi.number().integer().min(1).label('id params in the url').required()
+    });
+
+    // schema options
+    const options = {
+        abortEarly: false, // include all errors
+        allowUnknown: false, // ignore unknown props
+        stripUnknown: false // remove unknown props
+    };
+
+    // validate request body against schema
+    const { error, value } = schema.validate(req.params, options);
+
+    if (error) {
+        // on fail return comma separated errors
+        let message = error.details.map(x => x.message).join(', ')
+
+         
+        next(res.status(400).json({ error: message.split('"').join('') }));
+    } else {
+        // on success replace req.body with validated value and trigger next middleware function
+        req.params = value;
+        next();
+    }
+}
 
 
 
@@ -46,7 +79,7 @@ function editDirectorSchema(req, res, next) {
     const schema = Joi.object({
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
-        name: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(30).required(), 
+        name: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(25).required(), 
         facebook_likes: Joi.number().integer().min(0).strict()
     });
 
@@ -65,7 +98,7 @@ function editDirectorSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
         req.body = value;
@@ -75,13 +108,16 @@ function editDirectorSchema(req, res, next) {
 
 
 
+
+
+
 function getDirectorSchema(req, res, next) {
     // create schema object
     const schema = Joi.object({
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
-        length: Joi.number().integer().min(1),
-        page: Joi.number().integer().min(1)
+        length: Joi.number().integer().min(1).required(),
+        page: Joi.number().integer().min(1).required()
     });
 
     // schema options
@@ -99,10 +135,10 @@ function getDirectorSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
-        req.body = value;
+        req.query = value;
         next();
     }
 }
@@ -132,10 +168,10 @@ function getOneDirectorSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
-        req.body = value;
+        req.params = value;
         next();
     }
 }
@@ -165,10 +201,10 @@ function deleteOneDirectorSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
-        req.body = value;
+        req.params = value;
         next();
     }
 }
@@ -294,7 +330,9 @@ router.get('/director/:id',getOneDirectorSchema, [check('id').not().isEmpty().wi
     let id = req.params.id;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        
+        let message = errors.array().map(x => x.msg).join(', ')
+        return res.status(400).json({ error: message});
     }
     connection.query("SELECT * FROM directors WHERE id = ?", [id], (err, rows, fields, result) => {
         if (err) {
@@ -338,7 +376,9 @@ createDirectorSchema
         };
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
+        
+            let message = errors.array().map(x => x.msg).join(', ')
+            return res.status(400).json({ error: message});
         }
 
         connection.query("SELECT * from  directors where name = ? ", [name], (err, result, rows, fields) => {
@@ -390,12 +430,10 @@ createDirectorSchema
 
 
 router.put('/editDirector/:id',
-editDirectorSchema,
+editDirectorSchemaId,
+editDirectorSchema
 
-[
-  check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')
 
-]
 
 , (req, res, next) => {
 
@@ -414,7 +452,13 @@ editDirectorSchema,
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
+        
+        // console.log("ERR", errors)
+        let message = errors.array().map(x => x.msg).join(', ')
+        // console.log("MSG", message)
+
+
+        return res.status(400).json({ error: message});
     }
 
     connection.query("SELECT * from  directors where id = ? ", [id], (err, result, rows, fields) => {
@@ -445,6 +489,13 @@ editDirectorSchema,
                             res.status(500).send('Server Error');
 
                         }
+
+                        connection.query("UPDATE movies SET director_name = ? where director_id = ?", [name, id],(err,result) =>{
+                            if (err) {
+                                console.log(err.message)
+                                res.status(500).send('Server Error');
+            
+                            }                        })
                         console.log(obj)
                         res.status(200).json(obj)
                         next()
@@ -494,7 +545,9 @@ router.delete('/deleteDirector/:id', deleteOneDirectorSchema, [check('id').not()
     let id = req.params.id;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        
+        let message = errors.array().map(x => x.msg).join(', ')
+        return res.status(400).json({ error: message});
     }
 
     connection.query("Select * FROM directors WHERE id = ?", [id], (err, result) => {

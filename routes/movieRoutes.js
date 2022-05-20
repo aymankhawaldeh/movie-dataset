@@ -13,25 +13,25 @@ function createMovieSchema(req, res, next) {
     const schema = Joi.object({
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
-        title: Joi.string().min(3).max(45).required(), 
+        title: Joi.string().min(3).max(30).required(), 
         duration: Joi.number().integer().min(0).strict(),
         gross: Joi.number().min(0).strict(),
-        genres: Joi.array().items(Joi.string()),
+        genres: Joi.array().items(Joi.string()).min(1).unique(),
         num_voted_users: Joi.number().integer().min(0).strict(),
         cast_total_facebook_likes: Joi.number().integer().min(0).strict(),
-        plot_keywords: Joi.array().items(Joi.string()),
+        plot_keywords: Joi.array().items(Joi.string()).min(1).unique(),
         imdb_link: Joi.string(),
         num_user_for_reviews: Joi.number().integer().min(0).strict(),
-        language: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(30),
-        country: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(30),
-        content_rating: Joi.string().min(3).max(45),
+        language: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(15),
+        country: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(15),
+        content_rating: Joi.string().min(3).max(15),
         budget: Joi.number().min(0).strict(),
-        title_year: Joi.number().integer(),
+        title_year: Joi.number().integer().min(1990).max(2022),
         imdb_score: Joi.number().min(0).strict(),
         aspect_ratio: Joi.number().min(0).strict(),
         movie_facebook_likes: Joi.number().integer().min(0).strict(),
-        color: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(30),
-        director_name: Joi.string().regex(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/, 'Alpha, only real name in').min(3).max(30).required()
+        color: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(10),
+        director_name: Joi.string().regex(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/, 'Alpha, only real name in').min(3).max(25).required()
 
     });
 
@@ -50,7 +50,7 @@ function createMovieSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
         req.body = value;
@@ -59,32 +59,61 @@ function createMovieSchema(req, res, next) {
 }
 
 
+function editMovieSchemaId(req, res, next) {
+    // create schema object
+    const schema = Joi.object({
+        // name: Joi.string()
+        // .alphanum().min(3).max(30).required(),
+        id: Joi.number().integer().min(1).label('id params in the url').required()
+    });
 
+    // schema options
+    const options = {
+        abortEarly: false, // include all errors
+        allowUnknown: false, // ignore unknown props
+        stripUnknown: false // remove unknown props
+    };
+
+    // validate request body against schema
+    const { error, value } = schema.validate(req.params, options);
+
+    if (error) {
+        // on fail return comma separated errors
+        let message = error.details.map(x => x.message).join(', ')
+
+         
+        next(res.status(400).json({ error: message.split('"').join('') }));
+    } else {
+        // on success replace req.body with validated value and trigger next middleware function
+        req.params = value;
+        next();
+    }
+}
 
 function editMovieSchema(req, res, next) {
     // create schema object
     const schema = Joi.object({
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
-        title: Joi.string().min(3).max(45), 
+        title: Joi.string().min(3).max(30), 
         duration: Joi.number().integer().min(0).strict(),
         gross: Joi.number().min(0).strict(),
-        genres: Joi.array().items(Joi.string()),
+        genres: Joi.array().items(Joi.string()).min(1).unique(),
         num_voted_users: Joi.number().integer().min(0).strict(),
         cast_total_facebook_likes: Joi.number().integer().min(0).strict(),
-        plot_keywords: Joi.array().items(Joi.string()),
+        plot_keywords: Joi.array().items(Joi.string()).min(1).unique(),
         imdb_link: Joi.string(),
         num_user_for_reviews: Joi.number().integer().min(0).strict(),
-        language: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(30),
-        country: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(30),
-        content_rating: Joi.string().min(3).max(45),
+        language: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(15),
+        country: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(15),
+        content_rating: Joi.string().min(3).max(15),
         budget: Joi.number().min(0).strict(),
-        title_year: Joi.number().integer(),
+        title_year: Joi.number().integer().min(1990).max(2022),
         imdb_score: Joi.number().min(0).strict(),
         aspect_ratio: Joi.number().min(0).strict(),
         movie_facebook_likes: Joi.number().integer().min(0).strict(),
-        color: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(30),
-        director_name: Joi.string().regex(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/, 'Alpha, only real name in').min(3).max(30)
+        color: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(10),
+        director_name: Joi.string().regex(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/, 'Alpha, only real name in').min(3).max(25)
 
     });
 
@@ -103,7 +132,7 @@ function editMovieSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
         req.body = value;
@@ -118,8 +147,8 @@ function getMovieSchema(req, res, next) {
     const schema = Joi.object({
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
-        length: Joi.number().integer().min(1),     
-        page: Joi.number().integer().min(1)
+       length: Joi.number().integer().min(1).required(),
+        page: Joi.number().integer().min(1).required()
     });
 
     // schema options
@@ -137,10 +166,10 @@ function getMovieSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
-        req.body = value;
+        req.query = value;
         next();
     }
 }
@@ -170,10 +199,10 @@ function getOneMovieSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
-        req.body = value;
+        req.params = value;
         next();
     }
 }
@@ -203,10 +232,10 @@ function deleteOneMoviechema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
-        req.body = value;
+        req.params = value;
         next();
     }
 }
@@ -338,7 +367,9 @@ router.get('/getMovie/:id',getOneMovieSchema, [
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
+        
+        let message = errors.array().map(x => x.msg).join(', ')
+        return res.status(400).json({ error: message});
     }
 
 
@@ -497,7 +528,9 @@ createMovieSchema,
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array({ errors: errors.array({ onlyFirstError: true }) }) });
+        
+            let message = errors.array().map(x => x.msg).join(', ')
+            return res.status(400).json({ error: message});
         }
 
 
@@ -856,13 +889,12 @@ createMovieSchema,
 
 router.put('/editMoviewithot/:id',
 
-
+editMovieSchemaId,
 editMovieSchema,
 
     [
 
 
-        check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number'),
 
         // check('title', 'Title must be Alpha or alpha and numbers AND not empty').optional().isString(),
         // check('title', 'Title is required').optional().not().isEmpty(),
@@ -962,7 +994,9 @@ editMovieSchema,
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
+        
+            let message = errors.array().map(x => x.msg).join(', ')
+            return res.status(400).json({ error: message});
         }
 
         connection.query(`SELECT * FROM movies WHERE id = ${id}`,
@@ -1174,7 +1208,9 @@ router.delete('/deleteMovie/:id', deleteOneMoviechema, [check('id').not().isEmpt
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        
+        let message = errors.array().map(x => x.msg).join(', ')
+        return res.status(400).json({ error: message});
     }
 
 
@@ -1244,7 +1280,7 @@ router.delete('/deleteMovie/:id', deleteOneMoviechema, [check('id').not().isEmpt
 
 
 
-                            }
+                            } 
 
                         })
 

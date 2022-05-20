@@ -1,8 +1,76 @@
 const express = require('express');
 const router = express.Router();
-var connection = require('../database')
+var connection = require('../database');
+const Joi = require('joi');
 
 
+
+function getSearchSchema(req, res, next) {
+    // create schema object
+    const schema = Joi.object({
+        // name: Joi.string()
+        // .alphanum().min(3).max(30).required(),
+        title: Joi.string(),
+        genres: Joi.string(),
+        plot_keywords: Joi.string()
+
+    });
+
+    // schema options
+    const options = {
+        abortEarly: false, // include all errors
+        allowUnknown: false, // ignore unknown props
+        stripUnknown: false // remove unknown props
+    };
+
+    // validate request body against schema
+    const { error, value } = schema.validate(req.query, options);
+
+    if (error) {
+        // on fail return comma separated errors
+        let message = error.details.map(x => x.message).join(', ')
+
+         
+        next(res.status(400).json({ error: message.split('"').join('') }));
+    } else {
+        // on success replace req.body with validated value and trigger next middleware function
+        req.query = value;
+        next();
+    }
+}
+
+function getAllSchema(req, res, next) {
+    // create schema object
+    const schema = Joi.object({
+        // name: Joi.string()
+        // .alphanum().min(3).max(30).required(),
+        genres: Joi.string(),
+        plot_keywords: Joi.string()
+
+    });
+
+    // schema options
+    const options = {
+        abortEarly: false, // include all errors
+        allowUnknown: false, // ignore unknown props
+        stripUnknown: false // remove unknown props
+    };
+
+    // validate request body against schema
+    const { error, value } = schema.validate(req.query, options);
+
+    if (error) {
+        // on fail return comma separated errors
+        let message = error.details.map(x => x.message).join(', ')
+
+         
+        next(res.status(400).json({ error: message.split('"').join('') }));
+    } else {
+        // on success replace req.body with validated value and trigger next middleware function
+        req.query = value;
+        next();
+    }
+}
 
 
 
@@ -11,7 +79,7 @@ var connection = require('../database')
 
 // 1) 
 
-router.get('/movie/search', (req, res) => {
+router.get('/movie/search', getSearchSchema, (req, res, next) => {
 
 
 
@@ -30,6 +98,8 @@ router.get('/movie/search', (req, res) => {
     if (plot_keywords == null && genres == null && title == null) {
 
         res.status(404).json({ msg: 'Sorry their is no data available for your search' })
+        next()
+
 
 
 
@@ -44,10 +114,14 @@ router.get('/movie/search', (req, res) => {
 
             if (result.length == 0) {
                 res.status(404).json({ msg: 'Sorry no data similar found' })
+                next()
+
 
 
             } else {
                 res.status(200).send(result)
+                next()
+
 
 
             }
@@ -64,10 +138,14 @@ router.get('/movie/search', (req, res) => {
             }
             if (result.length == 0) {
                 res.status(404).json({ msg: 'Sorry no data similar found' })
+                next()
+
 
 
             } else {
                 res.status(200).send(result)
+                next()
+
 
 
             }
@@ -83,10 +161,14 @@ router.get('/movie/search', (req, res) => {
             }
             if (result.length == 0) {
                 res.status(404).json({ msg: 'Sorry no data similar found' })
+                next()
+
 
 
             } else {
                 res.status(200).send(result)
+                next()
+
 
 
             }
@@ -102,10 +184,14 @@ router.get('/movie/search', (req, res) => {
                 }
                 if (result.length == 0) {
                     res.status(404).json({ msg: 'Sorry no data similar found' })
+                    next()
+
 
 
                 } else {
                     res.status(200).send(result)
+                    next()
+
 
 
                 }
@@ -120,10 +206,14 @@ router.get('/movie/search', (req, res) => {
                 }
                 if (result.length == 0) {
                     res.status(404).json({ msg: 'Sorry no data similar found' })
+                    next()
+
 
 
                 } else {
                     res.status(200).send(result)
+                    next()
+
 
 
                 }
@@ -139,10 +229,14 @@ router.get('/movie/search', (req, res) => {
                 }
                 if (result.length == 0) {
                     res.status(404).json({ msg: 'Sorry no data similar found' })
+                    next()
+
 
 
                 } else {
                     res.status(200).send(result)
+                    next()
+
 
 
                 }
@@ -158,10 +252,14 @@ router.get('/movie/search', (req, res) => {
                 }
                 if (result.length == 0) {
                     res.status(404).json({ msg: 'Sorry no data similar found' })
+                    next()
+
 
 
                 } else {
                     res.status(200).send(result)
+                    next()
+
 
 
                 }
@@ -222,7 +320,7 @@ router.get('/movie/count', (req, res) => {
 
 // 3)
 
-router.get('/movie/all', (req, res) => {
+router.get('/movie/all', getAllSchema ,(req, res, next) => {
 
 
 
@@ -247,6 +345,7 @@ router.get('/movie/all', (req, res) => {
 
 
             res.status(200).send(result)
+            next()
 
 
         })
@@ -264,10 +363,14 @@ router.get('/movie/all', (req, res) => {
 
             if (result.length == 0) {
                 res.status(404).json({ msg: 'Sorry no data similar found' })
+                next()
+
 
 
             } else {
                 res.status(200).send(result)
+                next()
+
 
 
             }

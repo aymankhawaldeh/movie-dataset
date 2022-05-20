@@ -13,7 +13,7 @@ function createActorSchema(req, res, next) {
     const schema = Joi.object({
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
-        name: Joi.string().regex(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/, 'Alpha, only real name in').min(3).max(30).required(),
+        name: Joi.string().regex(/^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/, 'Alpha, only real name in').min(3).max(25).required(),
         facebook_likes: Joi.number().integer().min(0).strict()
     });
 
@@ -32,7 +32,7 @@ function createActorSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
         req.body = value;
@@ -42,12 +42,46 @@ function createActorSchema(req, res, next) {
 
 
 
+function editActorSchemaId(req, res, next) {
+    // create schema object
+    const schema = Joi.object({
+        // name: Joi.string()
+        // .alphanum().min(3).max(30).required(),
+        id: Joi.number().integer().min(1).label('id params in the url').required()
+    });
+
+    // schema options
+    const options = {
+        abortEarly: false, // include all errors
+        allowUnknown: false, // ignore unknown props
+        stripUnknown: false // remove unknown props
+    };
+
+    // validate request body against schema
+    const { error, value } = schema.validate(req.params, options);
+
+    if (error) {
+        // on fail return comma separated errors
+        let message = error.details.map(x => x.message).join(', ')
+
+         
+        next(res.status(400).json({ error: message.split('"').join('') }));
+    } else {
+        // on success replace req.body with validated value and trigger next middleware function
+        req.params = value;
+        next();
+    }
+}
+
+
+
+
 function editActorSchema(req, res, next) {
     // create schema object
     const schema = Joi.object({
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
-        name: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(30).required(),  
+        name: Joi.string().regex(/^[a-zA-Z ]+$/, 'Alpha, only spaces and text in').min(3).max(25).required(),  
         facebook_likes: Joi.number().integer().min(0).strict()
     });
 
@@ -66,7 +100,7 @@ function editActorSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
         req.body = value;
@@ -82,8 +116,8 @@ function getActorSchema(req, res, next) {
     const schema = Joi.object({
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
-        length: Joi.number().integer().min(1),  
-        page: Joi.number().integer().min(1)
+        length: Joi.number().integer().min(1).required(),
+        page: Joi.number().integer().min(1).required()
     });
 
     // schema options
@@ -101,10 +135,10 @@ function getActorSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
-        req.body = value;
+        req.query = value;
         next();
     }
 }
@@ -134,10 +168,10 @@ function getOneActorSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
-        req.body = value;
+        req.params = value;
         next();
     }
 }
@@ -167,10 +201,10 @@ function deleteOneActorSchema(req, res, next) {
         let message = error.details.map(x => x.message).join(', ')
 
          
-        next(res.status(400).json({ error: message }));
+        next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
-        req.body = value;
+        req.params = value;
         next();
     }
 }
@@ -296,9 +330,10 @@ router.get('/actor/:id', getOneActorSchema,[check('id').not().isEmpty().withMess
  
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
-
+        
+        let message = errors.array().map(x => x.msg).join(', ')
+        return res.status(400).json({ error: message});
+    }
 
 
     connection.query("SELECT * FROM actors WHERE id = ?", [id], (err, rows, fields, result) => {
@@ -353,9 +388,14 @@ createActorSchema
    };
 
    const errors = validationResult(req);
-   if (!errors.isEmpty()) {
-     return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
-   }
+//    if (!errors.isEmpty()) {
+//      return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
+//    }
+if (!errors.isEmpty()) {
+        
+    let message = errors.array().map(x => x.msg).join(', ')
+    return res.status(400).json({ error: message});
+}
 
     connection.query("SELECT * from  actors where name = ? ", [name], (err, result, rows, fields) => {
     if (err) {
@@ -401,12 +441,10 @@ createActorSchema
 
 
 
-router.put('/editActor/:id', [
-
-    editActorSchema,
-        check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')
-    
-    ], (req, res, next) => {
+router.put('/editActor/:id',
+editActorSchemaId, 
+    editActorSchema  
+    , (req, res, next) => {
 
 
     let id = req.params.id
@@ -424,7 +462,9 @@ router.put('/editActor/:id', [
     
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array({ onlyFirstError: true }) });
+        
+        let message = errors.array().map(x => x.msg).join(', ')
+        return res.status(400).json({ error: message});
     }
 
 
@@ -500,7 +540,9 @@ router.delete('/deleteActor/:id',deleteOneActorSchema, [check('id').not().isEmpt
     let id = req.params.id;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        
+        let message = errors.array().map(x => x.msg).join(', ')
+        return res.status(400).json({ error: message});
     }
 
      connection.query("Select * FROM actors WHERE id = ?", [id], (err, result) => {

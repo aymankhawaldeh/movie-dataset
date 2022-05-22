@@ -325,7 +325,7 @@ router.get('/movies', getMovieSchema, (req, res, next) => {
 
 
         // query for fetching data with page number and offset
-        const prodsQuery = "select * from directors limit " + length + " OFFSET " + offset
+        const prodsQuery = "select * from movies limit " + length + " OFFSET " + offset
 
         connection.query(prodsQuery, function (error, results, fields) {
             // When done with the connection, release it.

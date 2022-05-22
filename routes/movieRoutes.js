@@ -4,6 +4,7 @@ const { check, body, validationResult } = require('express-validator')
 var connection = require('../database')
 
 const Joi = require('joi');
+const { func } = require('joi');
 
 
 
@@ -13,7 +14,7 @@ function createMovieSchema(req, res, next) {
     const schema = Joi.object({
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
-        title: Joi.string().min(3).max(30).required(), 
+        title: Joi.string().min(3).max(30).required(),
         duration: Joi.number().integer().min(0).strict(),
         gross: Joi.number().min(0).strict(),
         genres: Joi.array().items(Joi.string()).min(1).unique(),
@@ -49,7 +50,7 @@ function createMovieSchema(req, res, next) {
         // on fail return comma separated errors
         let message = error.details.map(x => x.message).join(', ')
 
-         
+
         next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
@@ -81,7 +82,7 @@ function editMovieSchemaId(req, res, next) {
         // on fail return comma separated errors
         let message = error.details.map(x => x.message).join(', ')
 
-         
+
         next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
@@ -95,7 +96,7 @@ function editMovieSchema(req, res, next) {
     const schema = Joi.object({
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
-        title: Joi.string().min(3).max(30), 
+        title: Joi.string().min(3).max(30),
         duration: Joi.number().integer().min(0).strict(),
         gross: Joi.number().min(0).strict(),
         genres: Joi.array().items(Joi.string()).min(1).unique(),
@@ -131,7 +132,7 @@ function editMovieSchema(req, res, next) {
         // on fail return comma separated errors
         let message = error.details.map(x => x.message).join(', ')
 
-         
+
         next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
@@ -147,7 +148,7 @@ function getMovieSchema(req, res, next) {
     const schema = Joi.object({
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
-       length: Joi.number().integer().min(1).required(),
+        length: Joi.number().integer().min(1).required(),
         page: Joi.number().integer().min(1).required()
     });
 
@@ -165,7 +166,7 @@ function getMovieSchema(req, res, next) {
         // on fail return comma separated errors
         let message = error.details.map(x => x.message).join(', ')
 
-         
+
         next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
@@ -182,7 +183,7 @@ function getOneMovieSchema(req, res, next) {
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
         id: Joi.number().integer().min(1)
-        });
+    });
 
     // schema options
     const options = {
@@ -198,7 +199,7 @@ function getOneMovieSchema(req, res, next) {
         // on fail return comma separated errors
         let message = error.details.map(x => x.message).join(', ')
 
-         
+
         next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
@@ -215,7 +216,7 @@ function deleteOneMoviechema(req, res, next) {
         // name: Joi.string()
         // .alphanum().min(3).max(30).required(),
         id: Joi.number().integer().min(1)
-        });
+    });
 
     // schema options
     const options = {
@@ -231,7 +232,7 @@ function deleteOneMoviechema(req, res, next) {
         // on fail return comma separated errors
         let message = error.details.map(x => x.message).join(', ')
 
-         
+
         next(res.status(400).json({ error: message.split('"').join('') }));
     } else {
         // on success replace req.body with validated value and trigger next middleware function
@@ -270,46 +271,46 @@ function deleteOneMoviechema(req, res, next) {
 
 // PAGINATION
 
-router.get('/movies',getMovieSchema, (req, res, next) => {
+router.get('/movies', getMovieSchema, (req, res, next) => {
 
 
 
     let count;
 
-    connection.query("SELECT * from movies", (err,result,rows) =>{
+    connection.query("SELECT * from movies", (err, result, rows) => {
 
         if (err) throw err;
 
         count = result.length
     })
 
- 
+
     // limit per page as || 20
     const length = req.query.length
     // page number
     const page = req.query.page
 
-    if(!length || !page){
-
-        
+    if (!length || !page) {
 
 
-    connection.query("SELECT * from movies", (err, rows, fields, result) => {
-        if (err) {
-            console.log(err.message)
-            res.status(500).send('Server Error');
-
-        }
-        if (rows.length == 0) {
-            return res.status(404).json({ msg: 'No movies found' })
-            next()
 
 
-        } else {
-            res.status(200).send(rows)
-            next()
-        }
-    })
+        connection.query("SELECT * from movies", (err, rows, fields, result) => {
+            if (err) {
+                console.log(err.message)
+                res.status(500).send('Server Error');
+
+            }
+            if (rows.length == 0) {
+                return res.status(404).json({ msg: 'No movies found' })
+                next()
+
+
+            } else {
+                res.status(200).send(rows)
+                next()
+            }
+        })
 
 
     } else {
@@ -318,48 +319,49 @@ router.get('/movies',getMovieSchema, (req, res, next) => {
 
 
 
-    // calculate offset
-    const offset = (page - 1) * length
+        // calculate offset
+        const offset = (page - 1) * length
 
 
-    
-    // query for fetching data with page number and offset
-    const prodsQuery = "select * from directors limit "+length+" OFFSET "+offset
- 
-      connection.query(prodsQuery, function (error, results, fields) {
-        // When done with the connection, release it.
-             if (error) throw error;
 
-      
-         if(results.length == 0){
-             res.status(404).json({"msg": `sorry there is no data in this page number (${page})`})
-             next()
+        // query for fetching data with page number and offset
+        const prodsQuery = "select * from directors limit " + length + " OFFSET " + offset
 
-         } else {
+        connection.query(prodsQuery, function (error, results, fields) {
+            // When done with the connection, release it.
+            if (error) throw error;
 
-        // create payload
-        var jsonResult = {
-          'count':count,
-          'page_number':page,
-          'length':results.length,
-          'data':results
-        }
-        // create response
-        var myJsonString = JSON.parse(JSON.stringify(jsonResult));
-        // res.statusMessage = "Products for page "+page;
-        res.statusCode = 200;
-        res.json(myJsonString);
-        // res.end();
+
+            if (results.length == 0) {
+                res.status(404).json({ "msg": `sorry there is no data in this page number (${page})` })
+                next()
+
+            } else {
+
+                // create payload
+                var jsonResult = {
+                    'count': count,
+                    'page_number': page,
+                    'length': results.length,
+                    'data': results
+                }
+                // create response
+                var myJsonString = JSON.parse(JSON.stringify(jsonResult));
+                // res.statusMessage = "Products for page "+page;
+                res.statusCode = 200;
+                res.json(myJsonString);
+                // res.end();
+            }
+        })
     }
-      })}
-    })
+})
 
 
 
 
 
 
-router.get('/getMovie/:id',getOneMovieSchema, [
+router.get('/getMovie/:id', getOneMovieSchema, [
     check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')
 ], (req, res, next) => {
     let id = req.params.id;
@@ -367,9 +369,9 @@ router.get('/getMovie/:id',getOneMovieSchema, [
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        
+
         let message = errors.array().map(x => x.msg).join(', ')
-        return res.status(400).json({ error: message});
+        return res.status(400).json({ error: message });
     }
 
 
@@ -403,7 +405,7 @@ router.get('/getMovie/:id',getOneMovieSchema, [
 
 
 router.post('/addMovie',
-createMovieSchema,
+    createMovieSchema,
     [
         // check('title', 'Title must be Alpha or alpha and numbers AND not empty').optional().isString(),
         // check('title', 'Title is required').not().isEmpty(),
@@ -528,9 +530,9 @@ createMovieSchema,
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-        
+
             let message = errors.array().map(x => x.msg).join(', ')
-            return res.status(400).json({ error: message});
+            return res.status(400).json({ error: message });
         }
 
 
@@ -887,10 +889,9 @@ createMovieSchema,
 
 
 
-router.put('/editMoviewithot/:id',
-
-editMovieSchemaId,
-editMovieSchema,
+router.put('/editMovie/:id',
+    editMovieSchemaId,
+    editMovieSchema,
 
     [
 
@@ -987,6 +988,10 @@ editMovieSchema,
         let color
         let director_id
         let director_name
+        let dir_name
+        let arr = [];
+        let newarr = [];
+        let arr1 = [];
         let obj = {
             Status: 'Movie Updated Successfully',
             Data: { "title": title, "duration": duration, "gross": gross, "num_voted_users": num_voted_users, "cast_total_facebook_likes": cast_total_facebook_likes, "plot_keywords": plot_keywords, "imdb_link": imdb_link, "num_user_for_reviews": num_user_for_reviews, "language": language, "country": country, "content_rating": content_rating, "budget": budget, "title_year": title_year, "imdb_score": imdb_score, "aspect_ratio": aspect_ratio, "movie_facebook_likes": movie_facebook_likes, "color": color, "director_id": director_id }
@@ -994,9 +999,9 @@ editMovieSchema,
 
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
-        
+
             let message = errors.array().map(x => x.msg).join(', ')
-            return res.status(400).json({ error: message});
+            return res.status(400).json({ error: message });
         }
 
         connection.query(`SELECT * FROM movies WHERE id = ${id}`,
@@ -1033,6 +1038,12 @@ editMovieSchema,
                     req.body.color ? color = req.body.color : color = result[0].color
                     director_id = result[0].director_id
                     req.body.director_name ? director_name = req.body.director_name : director_name = result[0].director_name
+
+                    let previousDirectorName = result[0].director_name;
+                    let previousTitleName = result[0].title;
+                    let prevTitleJson = JSON.stringify(result[0].title)
+                    console.log(prevTitleJson)
+
 
                     let obj = {
                         Status: 'Movie Updated Successfully',
@@ -1072,8 +1083,393 @@ editMovieSchema,
 
                                                         }
                                                         // onsole.log(obj)
-                                                         res.status(200).json(obj)
+                                                        res.status(200).json(obj)
+
                                                         next()
+                                                        
+
+                                                        if (previousDirectorName !== director_name && previousTitleName !== title) {
+
+
+                                                            function create(arr) {
+                                                                return new Promise((resolve, reject) => {
+
+
+                                                                    dir_name = previousDirectorName;
+                                                                    console.log("previuoussdsdsd", dir_name)
+
+
+                                                                    connection.query("SELECT movies from directors WHERE name = ? ", [dir_name], (err, result, rows, fields) => {
+                                                                        if (err) {
+                                                                            throw err;
+                                                                        }
+
+
+                                                                        if (result[0].movies) {
+
+                                                                            let datanew = JSON.parse(result[0].movies);
+                                                                            let y;
+                                                                            for (let x in datanew) {
+                                                                                y = arr.push(datanew[x])
+                                                                            }
+                                                                            console.log("bre arr",arr)
+
+
+                                                                            resolve(
+                                                                                newarr = arr.filter(function (ele) {
+                                                                                    return ele != previousTitleName;
+                                                                                }))
+
+
+
+
+                                                                        }
+
+
+
+                                                                    })
+
+
+
+
+
+
+
+
+
+
+                                                                })
+
+
+                                                            }
+
+
+
+
+                                                            function get() {
+
+
+                                                                moviess = JSON.stringify(newarr)
+                                                                console.log("in get previous", dir_name)
+                                                                console.log("in get new arr", newarr)
+                                                                console.log("mivuesssss", moviess)
+
+
+
+                                                                connection.query("UPDATE directors SET movies = ? WHERE name = ? ", [moviess, dir_name], (err, result, rows, fields) => {
+                                                                    if (err) throw err;
+                                                                    console.log("hoon")
+
+                                                                })
+
+                                                            
+
+                                                            }
+
+                                                            create(arr).then(get).catch(err => console.log(err));
+
+
+
+
+
+
+
+
+
+                                                            function create1(arr1) {
+                                                                return new Promise((resolve, reject) => {
+
+
+
+                                                                    connection.query("SELECT movies from directors WHERE name = ? ", [director_name], (err, result, rows, fields) => {
+                                                                        if (err) {
+                                                                            throw err;
+                                                                        }
+
+                                                                        console.log("Result movies", result[0].movies)
+
+
+                                                                        if (result[0].movies) {
+
+                                                                            let dataq = JSON.parse(result[0].movies);
+                                                                            let j;
+                                                                            for (let x in dataq) {
+                                                                                j = arr1.push(dataq[x])
+                                                                            }
+                                                                            return j
+
+
+
+                                                                        }
+
+                                                                    })
+
+
+
+                                                                    connection.query("SELECT title from movies WHERE title = ? ", [title], (err, result, rows, fields) => {
+                                                                        if (err) {
+                                                                            reject(err);
+                                                                        }
+                                                                        resolve(arr1.push(result[0]?.title))
+                                                                       
+                                                                    })
+                                                                })
+
+                                                            }
+
+
+
+
+                                                            function get1() {
+                                                                console.log("arr1",arr1)
+
+                                                                movies = JSON.stringify(arr1)
+
+                                                                connection.query("UPDATE directors SET movies = ? WHERE name = ? ", [movies, director_name], (err, result, rows, fields) => {
+                                                                    if (err) throw err;
+                                                                    console.log("mesh hoon")
+                                                                })
+
+                                                            }
+
+                                                            create1(arr1).then(get1).catch(err => console.log(err))
+
+
+                                                        } else if (previousDirectorName == director_name && previousTitleName !== title) {
+
+                                                            //
+
+
+                                                            function create(arr) {
+                                                                return new Promise((resolve, reject) => {
+
+
+                                                                    dir_name = previousDirectorName;
+                                                                    console.log("previuoussdsdsd", dir_name)
+
+
+                                                                    connection.query("SELECT movies from directors WHERE name = ? ", [dir_name], (err, result, rows, fields) => {
+                                                                        if (err) {
+                                                                            throw err;
+                                                                        }
+
+
+                                                                        if (result[0].movies) {
+
+                                                                            let datanew = JSON.parse(result[0].movies);
+                                                                            let y;
+                                                                            for (let x in datanew) {
+                                                                                y = arr.push(datanew[x])
+                                                                            }
+                                                                            console.log("bre arr",arr)
+
+
+                                                                            
+                                                                                newarr = arr.filter(function (ele) {
+                                                                                    return ele != previousTitleName;
+                                                                                })
+
+
+
+                                                                                resolve(newarr.push(title))
+
+
+
+                                                                        }
+
+                                                                    })
+
+                                                                })
+
+
+                                                            }
+
+
+
+
+                                                            function get() {
+
+
+                                                                moviess = JSON.stringify(newarr)
+                                                                console.log("in get previous", dir_name)
+                                                                console.log("in get new arr", newarr)
+                                                                console.log("mivuesssss", moviess)
+
+
+
+                                                                connection.query("UPDATE directors SET movies = ? WHERE name = ? ", [moviess, dir_name], (err, result, rows, fields) => {
+                                                                    if (err) throw err;
+                                                                    console.log("hoon")
+
+                                                                })
+
+                                                            
+
+                                                            }
+
+                                                            create(arr).then(get).catch(err => console.log(err));
+
+
+
+
+                                                        } else if (previousDirectorName !== director_name && previousTitleName == title) {
+
+                                                            //
+
+
+
+                                                            function create(arr) {
+                                                                return new Promise((resolve, reject) => {
+
+
+                                                                    dir_name = previousDirectorName;
+                                                                    console.log("previuoussdsdsd", dir_name)
+
+
+                                                                    connection.query("SELECT movies from directors WHERE name = ? ", [dir_name], (err, result, rows, fields) => {
+                                                                        if (err) {
+                                                                            throw err;
+                                                                        }
+
+
+                                                                        if (result[0].movies) {
+
+                                                                            let datanew = JSON.parse(result[0].movies);
+                                                                            let y;
+                                                                            for (let x in datanew) {
+                                                                                y = arr.push(datanew[x])
+                                                                            }
+                                                                            console.log("bre arr",arr)
+
+
+                                                                            resolve(
+                                                                                newarr = arr.filter(function (ele) {
+                                                                                    return ele != previousTitleName;
+                                                                                }))
+
+
+
+
+                                                                        }
+
+
+
+                                                                    })
+
+
+
+
+
+
+
+
+
+
+                                                                })
+
+
+                                                            }
+
+
+
+
+                                                            function get() {
+
+
+                                                                moviess = JSON.stringify(newarr)
+                                                                console.log("in get previous", dir_name)
+                                                                console.log("in get new arr", newarr)
+                                                                console.log("mivuesssss", moviess)
+
+
+
+                                                                connection.query("UPDATE directors SET movies = ? WHERE name = ? ", [moviess, dir_name], (err, result, rows, fields) => {
+                                                                    if (err) throw err;
+                                                                    console.log("hoon")
+
+                                                                })
+
+                                                            
+
+                                                            }
+
+                                                            create(arr).then(get).catch(err => console.log(err));
+
+
+
+
+
+
+
+
+
+                                                            function create1(arr1) {
+                                                                return new Promise((resolve, reject) => {
+
+
+
+                                                                    connection.query("SELECT movies from directors WHERE name = ? ", [director_name], (err, result, rows, fields) => {
+                                                                        if (err) {
+                                                                            throw err;
+                                                                        }
+
+                                                                        console.log("Result movies", result[0].movies)
+
+
+                                                                        if (result[0].movies) {
+
+                                                                            let dataq = JSON.parse(result[0].movies);
+                                                                            let j;
+                                                                            for (let x in dataq) {
+                                                                                j = arr1.push(dataq[x])
+                                                                            }
+                                                                            return j
+
+
+
+                                                                        }
+
+                                                                    })
+
+
+
+                                                                    connection.query("SELECT title from movies WHERE title = ? ", [title], (err, result, rows, fields) => {
+                                                                        if (err) {
+                                                                            reject(err);
+                                                                        }
+                                                                        resolve(arr1.push(result[0]?.title))
+                                                                       
+                                                                    })
+                                                                })
+
+                                                            }
+
+
+
+
+                                                            function get1() {
+                                                                console.log("arr1",arr1)
+
+                                                                movies = JSON.stringify(arr1)
+
+                                                                connection.query("UPDATE directors SET movies = ? WHERE name = ? ", [movies, director_name], (err, result, rows, fields) => {
+                                                                    if (err) throw err;
+                                                                    console.log("mesh hoon")
+                                                                })
+
+                                                            }
+
+                                                            create1(arr1).then(get1).catch(err => console.log(err))
+
+
+
+
+
+
+                                                        }
+
+
+
 
                                                     });
 
@@ -1106,9 +1502,68 @@ editMovieSchema,
 
 
 
+                                            let arre = [];
+                                            let newarre = [];
+
+
+
+                                            connection.query("SELECT * from directors WHERE JSON_CONTAINS(movies, ?)  ", [prevTitleJson], (err, result, rows, fields) => {
+                                                if (err) throw err;
+
+
+                                                if (result.length !== 0) {
+
+
+
+                                                    let cuurentDirectorID = result[0].id
+                                                    console.log(cuurentDirectorID)
+
+                                                    function createe() {
+                                                        return new Promise((resolve, reject) => {
+
+
+                                                            let datanew = JSON.parse(result[0].movies);
+                                                            let y;
+                                                            for (let x in datanew) {
+                                                                y = arre.push(datanew[x])
+                                                            }
+
+
+                                                            newarre = arre.filter(function (ele) {
+                                                                return ele != previousTitleName;
+                                                            })
+
+                                                            resolve(newarre.push(title))
+
+
+                                                        });
+
+                                                    }
+
+
+
+                                                    function gett() {
+                                                        moviesssss = JSON.stringify(newarre)
+                                                        connection.query("UPDATE directors SET movies = ? WHERE id = ? ", [moviesssss, cuurentDirectorID], (err, result, rows, fields) => {
+                                                            if (err) throw err;
+                                                        })
+
+                                                    }
+
+
+                                                }
+
+
+                                                createe(arre).then(gett).catch(err => console.log(err))
+
+
+
+
+                                            })
+
                                             console.log(obj)
-                                             res.status(200).json(obj)
-                                             next()
+                                            res.status(200).json(obj)
+                                            next()
 
                                         });
                                 }
@@ -1136,15 +1591,156 @@ editMovieSchema,
 
                                         connection.query("UPDATE movies SET \
                                         title = ?, duration = ?, gross = ?, genres = ?, num_voted_users = ?, cast_total_facebook_likes = ?, plot_keywords = ?, imdb_link = ?, num_user_for_reviews = ?, language = ?, country = ?, content_rating = ?, budget = ?, title_year = ?, imdb_score = ?, aspect_ratio = ?, movie_facebook_likes = ?, color = ?, director_id = ?, director_name = ? WHERE movies.id = ?" ,
-                                        [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, color, dir_id, director_name, id], function (err, result) {
+                                            [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, color, dir_id, director_name, id], function (err, result) {
                                                 if (err) {
                                                     console.log(err.message)
                                                     return res.status(500).send('Server Error');
 
                                                 }
                                                 // onsole.log(obj)
-                                                 res.status(200).json(obj)
-                                                 next()
+                                                res.status(200).json(obj)
+                                                next()
+
+
+                                                if (previousDirectorName !== director_name) {
+
+
+                                                    function create(arr) {
+                                                        return new Promise((resolve, reject) => {
+
+
+                                                            dir_name = previousDirectorName;
+                                                            console.log("previuoussdsdsd", dir_name)
+
+
+                                                            connection.query("SELECT movies from directors WHERE name = ? ", [dir_name], (err, result, rows, fields) => {
+                                                                if (err) {
+                                                                    throw err;
+                                                                }
+
+
+                                                                if (result[0].movies) {
+
+                                                                    let datanew = JSON.parse(result[0].movies);
+                                                                    let y;
+                                                                    for (let x in datanew) {
+                                                                        y = arr.push(datanew[x])
+                                                                    }
+
+
+                                                                    resolve(
+                                                                        newarr = arr.filter(function (ele) {
+                                                                            return ele != title;
+                                                                        }))
+
+
+
+
+                                                                }
+
+
+
+                                                            })
+
+
+
+
+
+
+
+
+
+
+                                                        })
+
+
+                                                    }
+
+
+
+
+                                                    function get() {
+
+
+                                                        moviess = JSON.stringify(newarr)
+                                                        console.log("in get previous", dir_name)
+                                                        console.log("in get new arr", newarr)
+
+
+                                                        connection.query("UPDATE directors SET movies = ? WHERE name = ? ", [moviess, dir_name], (err, result, rows, fields) => {
+                                                            if (err) throw err;
+
+                                                        })
+
+                                                    }
+
+                                                    create(arr).then(get).catch(err => console.log(err));
+
+
+
+
+
+
+
+
+
+
+
+
+                                                    function create1(arr1) {
+                                                        return new Promise((resolve, reject) => {
+
+
+
+                                                            connection.query("SELECT movies from directors WHERE name = ? ", [director_name], (err, result, rows, fields) => {
+                                                                if (err) {
+                                                                    throw err;
+                                                                }
+
+
+                                                                if (result[0].movies) {
+
+                                                                    let data = JSON.parse(result[0].movies);
+                                                                    let j;
+                                                                    for (let x in data) {
+                                                                        j = arr1.push(data[x])
+                                                                    }
+                                                                    return j
+
+
+
+                                                                }
+
+                                                            })
+
+
+                                                            connection.query("SELECT title from movies WHERE title = ? ", [title], (err, result, rows, fields) => {
+                                                                if (err) {
+                                                                    reject(err);
+                                                                }
+                                                                arr1.push(result[0]?.title)
+                                                                resolve()
+                                                            })
+                                                        })
+
+                                                    }
+
+
+
+
+                                                    function get1() {
+                                                        movies = JSON.stringify(arr1)
+
+                                                        connection.query("UPDATE directors SET movies = ? WHERE name = ? ", [movies, director_name], (err, result, rows, fields) => {
+                                                            if (err) throw err;
+                                                        })
+
+                                                    }
+
+                                                    create1(arr1).then(get1).catch(err => console.log(err))
+
+
+                                                }
 
                                             });
 
@@ -1168,7 +1764,7 @@ editMovieSchema,
 
                             connection.query("UPDATE movies SET \
                             title = ?, duration = ?, gross = ?, genres = ?, num_voted_users = ?, cast_total_facebook_likes = ?, plot_keywords = ?, imdb_link = ?, num_user_for_reviews = ?, language = ?, country = ?, content_rating = ?, budget = ?, title_year = ?, imdb_score = ?, aspect_ratio = ?, movie_facebook_likes = ?, color = ?, director_id = ?, director_name = ? WHERE movies.id = ?" ,
-                            [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, color, director_id, director_name, id], function (err, result){
+                                [title, duration, gross, genres, num_voted_users, cast_total_facebook_likes, plot_keywords, imdb_link, num_user_for_reviews, language, country, content_rating, budget, title_year, imdb_score, aspect_ratio, movie_facebook_likes, color, director_id, director_name, id], function (err, result) {
                                     if (err) {
                                         console.log(err.message)
                                         return res.status(500).send('Server Error');
@@ -1178,8 +1774,8 @@ editMovieSchema,
 
 
                                     console.log(obj)
-                                     res.status(200).json(obj)
-                                     next()
+                                    res.status(200).json(obj)
+                                    next()
 
                                 });
                         }
@@ -1208,9 +1804,9 @@ router.delete('/deleteMovie/:id', deleteOneMoviechema, [check('id').not().isEmpt
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        
+
         let message = errors.array().map(x => x.msg).join(', ')
-        return res.status(400).json({ error: message});
+        return res.status(400).json({ error: message });
     }
 
 
@@ -1280,7 +1876,7 @@ router.delete('/deleteMovie/:id', deleteOneMoviechema, [check('id').not().isEmpt
 
 
 
-                            } 
+                            }
 
                         })
 

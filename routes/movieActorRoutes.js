@@ -6,6 +6,7 @@ const Joi = require('joi');
 
 
 
+
 function createMovieActorSchema(req, res, next) {
     // create schema object
     const schema = Joi.object({
@@ -303,7 +304,6 @@ getOneActorMovieSchema,
 
 
 router.post('/addActorMovie',
-
 createMovieActorSchema,
 [
     check('movie_id').not().isEmpty().withMessage('you must identify movie_id'),

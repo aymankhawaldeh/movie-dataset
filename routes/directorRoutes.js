@@ -3,7 +3,40 @@ const router = express.Router();
 const { checkSchema, check, validationResult } = require('express-validator')
 const Joi = require('joi');
 
-var connection = require('../database')
+var connection = require('../database');
+
+
+
+// function checkIfEmptyQuery(req, res, next) {
+//     // create schema object
+//     const schema = Joi.object({
+//         // name: Joi.string()
+//         // .alphanum().min(3).max(30).required(),
+        
+//     });
+
+//     // schema options
+//     const options = {
+//         abortEarly: false, // include all errors
+//         allowUnknown: false, // ignore unknown props
+//         stripUnknown: false // remove unknown props
+//     };
+
+//     // validate request body against schema
+//     const { error, value } = schema.validate(req.query, options);
+
+//     if (error) {
+//         // on fail return comma separated errors
+//         let message = error.details.map(x => x.message).join(', ')
+
+         
+//         next(res.status(400).json({ error: message.split('"').join('') }));
+//     } else {
+//         // on success replace req.body with validated value and trigger next middleware function
+//         req.query = value;
+//         next();
+//     }
+// }
 
 
 function createDirectorSchema(req, res, next) {
@@ -24,6 +57,7 @@ function createDirectorSchema(req, res, next) {
 
     // validate request body against schema
     const { error, value } = schema.validate(req.body, options);
+
 
     if (error) {
         // on fail return comma separated errors
@@ -430,6 +464,7 @@ createDirectorSchema
 
 
 router.put('/editDirector/:id',
+
 editDirectorSchemaId,
 editDirectorSchema
 
@@ -541,7 +576,7 @@ editDirectorSchema
 // DELETE ROUTES
 
 
-router.delete('/deleteDirector/:id', deleteOneDirectorSchema, [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')], (req, res, next) => {
+router.delete('/deleteDirector/:id',deleteOneDirectorSchema, [check('id').not().isEmpty().withMessage('you must identify the id for the data'), check('id').isInt({ gt: -1 }).withMessage('id must be a real Integer number')], (req, res, next) => {
     let id = req.params.id;
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

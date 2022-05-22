@@ -43,7 +43,7 @@ app.get('/passing', (req, res) => {
     let csvStream = csv.parseFile(".\\csv\\movie_metadata.csv", { headers: true })
         .on("data", function (record) {
             csvStream.pause();
-             if (counter < 176) {
+            //  if (counter < 176) {
 
                 let title = record.movie_title.trim().replace(/\s/g, "") == "" ? null : record.movie_title.trim()
                 let duration = record.duration.replace(/\s/g, "") == "" ? 0 : record.duration
@@ -217,8 +217,8 @@ app.get('/passing', (req, res) => {
 
 
 
-                ++counter;
-            }
+            //     ++counter;
+            // }
         }).on("end", function () {
             console.log("Job is done!");
         }).on("error", function (err) {

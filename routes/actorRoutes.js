@@ -442,6 +442,7 @@ if (!errors.isEmpty()) {
 
 
 router.put('/editActor/:id',
+
 editActorSchemaId, 
     editActorSchema  
     , (req, res, next) => {
